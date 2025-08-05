@@ -1,0 +1,270 @@
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+local Lighting = game:GetService("Lighting")
+
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+LocalPlayer.CharacterAdded:Connect(function(char)
+    Character = char
+    Humanoid = char:WaitForChild("Humanoid")
+    HRP = char:WaitForChild("HumanoidRootPart")
+end)
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DeltaMobileMegaMenu"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game.CoreGui
+
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 300, 0, 520)
+MainFrame.Position = UDim2.new(0, 15, 0.15, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BorderSizePixel = 0
+MainFrame.Visible = true
+
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, 0, 0, 45)
+Title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Title.TextColor3 = Color3.new(1,1,1)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 24
+Title.Text = "🔥 Delta Mobile Mega Menu"
+Title.BorderSizePixel = 0
+
+local ScrollFrame = Instance.new("ScrollingFrame", MainFrame)
+ScrollFrame.Size = UDim2.new(1, 0, 1, -45)
+ScrollFrame.Position = UDim2.new(0, 0, 0, 45)
+ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+ScrollFrame.ScrollBarThickness = 8
+ScrollFrame.BackgroundTransparency = 1
+ScrollFrame.BorderSizePixel = 0
+ScrollFrame.ScrollingEnabled = true
+
+local toggles = {}
+
+local function createToggle(text, parent, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -20, 0, 40)
+    btn.Position = UDim2.new(0, 10, 0, #toggles*45)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 18
+    btn.Text = text
+    btn.BorderSizePixel = 0
+    btn.Parent = parent
+
+    local state = false
+    btn.AutoButtonColor = true
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        btn.BackgroundColor3 = state and Color3.fromRGB(0, 170, 0) or Color3.fromRGB(50, 50, 50)
+        callback(state)
+    end)
+
+    table.insert(toggles, btn)
+    parent.CanvasSize = UDim2.new(0, 0, 0, (#toggles)*45)
+end
+
+-- Variáveis para conexões e estados
+local flyConn, bv, flying = nil, nil, false
+local infiniteJumpConn = nil
+local noClipConn = nil
+local tpConn = nil
+local antiFallConn = nil
+local antiKnockbackConn = nil
+local magnetConn = nil
+local freezeConn = nil
+local radarConn = nil
+local scarySound = nil
+local npcFriendly = nil
+local npcEnemy = nil
+
+local markers = {}
+
+-- Funções das toggles
+
+createToggle("Super Jump", ScrollFrame, function(state)
+    if Humanoid then
+        Humanoid.JumpPower = state and 200 or 50
+    end
+end)
+
+createToggle("Speed Boost", ScrollFrame, function(state)
+    if Humanoid then
+        Humanoid.WalkSpeed = state and 100 or 16
+    end
+end)
+
+createToggle("Infinite Jump", ScrollFrame, function(state)
+    if state then
+        infiniteJumpConn = UserInputService.JumpRequest:Connect(function()
+            if Humanoid then
+                Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end)
+    else
+        if infiniteJumpConn then
+            infiniteJumpConn:Disconnect()
+            infiniteJumpConn = nil
+        end
+    end
+end)
+
+createToggle("Fly", ScrollFrame, function(state)
+    flying = state
+    if flying then
+        bv = Instance.new("BodyVelocity")
+        bv.MaxForce = Vector3.new(1e5,1e5,1e5)
+        bv.Velocity = Vector3.new(0,10,0)
+        bv.Parent = HRP
+
+        flyConn = RunService.Heartbeat:Connect(function()
+            if not flying then return end
+            bv.Velocity = Vector3.new(0,10,0)
+        end)
+    else
+        if flyConn then flyConn:Disconnect() flyConn = nil end
+        if bv then bv:Destroy() bv = nil end
+    end
+end)
+
+createToggle("God Mode", ScrollFrame, function(state)
+    if Humanoid then
+        if state then
+            Humanoid.MaxHealth = math.huge
+            Humanoid.Health = math.huge
+        else
+            Humanoid.MaxHealth = 100
+            Humanoid.Health = 100
+        end
+    end
+end)
+
+createToggle("ShiftLock", ScrollFrame, function(state)
+    LocalPlayer.CameraMode = state and Enum.CameraMode.LockFirstPerson or Enum.CameraMode.Classic
+end)
+
+createToggle("NoClip", ScrollFrame, function(state)
+    if state then
+        noClipConn = RunService.Stepped:Connect(function()
+            if Character then
+                for _, part in pairs(Character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    else
+        if noClipConn then noClipConn:Disconnect() noClipConn = nil end
+        if Character then
+            for _, part in pairs(Character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
+            end
+        end
+    end
+end)
+
+createToggle("Sembunyi (Visual)", ScrollFrame, function(state)
+    if state then
+        for _, part in pairs(Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.LocalTransparencyModifier = 1
+            end
+        end
+    else
+        for _, part in pairs(Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.LocalTransparencyModifier = 0
+            end
+        end
+    end
+end)
+
+createToggle("Spawn NPC Amigável (Visual)", ScrollFrame, function(state)
+    if state then
+        if npcFriendly then npcFriendly:Destroy() npcFriendly = nil end
+        npcFriendly = Instance.new("Model", Workspace)
+        npcFriendly.Name = "FriendlyNPC"
+        local part = Instance.new("Part", npcFriendly)
+        part.Size = Vector3.new(2,5,2)
+        part.Position = HRP.Position + Vector3.new(5,0,0)
+        part.Anchored = false
+        part.BrickColor = BrickColor.new("Bright green")
+        local humNPC = Instance.new("Humanoid", npcFriendly)
+        task.delay(15, function()
+            if npcFriendly then npcFriendly:Destroy() npcFriendly = nil end
+        end)
+    else
+        if npcFriendly then npcFriendly:Destroy() npcFriendly = nil end
+    end
+end)
+
+createToggle("Spawn NPC Inimigo (Visual)", ScrollFrame, function(state)
+    if state then
+        if npcEnemy then npcEnemy:Destroy() npcEnemy = nil end
+        npcEnemy = Instance.new("Model", Workspace)
+        npcEnemy.Name = "EnemyNPC"
+        local part = Instance.new("Part", npcEnemy)
+        part.Size = Vector3.new(2,5,2)
+        part.Position = HRP.Position + Vector3.new(-5,0,0)
+        part.Anchored = false
+        part.BrickColor = BrickColor.new("Really red")
+        local humNPC = Instance.new("Humanoid", npcEnemy)
+        task.delay(15, function()
+            if npcEnemy then npcEnemy:Destroy() npcEnemy = nil end
+        end)
+    else
+        if npcEnemy then npcEnemy:Destroy() npcEnemy = nil end
+    end
+end)
+
+createToggle("(Visual1)", ScrollFrame, function(state)
+    if state then
+        Lighting.Ambient = Color3.fromRGB(100, 0, 0)
+        Lighting.OutdoorAmbient = Color3.fromRGB(50, 0, 0)
+    else
+        Lighting.Ambient = Color3.fromRGB(128, 128, 128)
+        Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+    end
+end)
+
+createToggle("Modo Noite (Visual2)", ScrollFrame, function(state)
+    if state then
+        Lighting.TimeOfDay = "00:00:00"
+        Lighting.FogEnd = 100
+        Lighting.Brightness = 0.2
+    else
+        Lighting.TimeOfDay = "14:00:00"
+        Lighting.FogEnd = 100000
+        Lighting.Brightness = 2
+    end
+end)
+
+-- Botão flutuante para abrir/fechar o menu
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Size = UDim2.new(0, 50, 0, 50)
+toggleBtn.Position = UDim2.new(0, 10, 0.4, 0)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
+toggleBtn.BorderSizePixel = 0
+toggleBtn.Text = "≡"
+toggleBtn.TextColor3 = Color3.new(1,1,1)
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextSize = 30
+toggleBtn.Parent = ScreenGui
+toggleBtn.ZIndex = 10
+
+toggleBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
