@@ -1,0 +1,678 @@
+-- loadstring's in "obfuscator" counter: 6
+-- allat for chat gpt script..
+
+-- Compact Coordinate GUI
+local plrs = game:GetService("Players")
+local tweens = game:GetService("TweenService")
+local plr = plrs.LocalPlayer
+local runs = game:GetService("RunService")
+
+if game.CoreGui:FindFirstChild("CompactCoordGUI") then
+    game.CoreGui.CompactCoordGUI:Destroy()
+end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "CompactCoordGUI"
+gui.Parent = game.CoreGui
+
+local main = Instance.new("Frame")
+main.Size = UDim2.new(0, 260, 0, 320)
+main.Position = UDim2.new(0.5, -130, 0.5, -160)
+main.BackgroundColor3 = Color3.new(0.06, 0.06, 0.1)
+main.BorderSizePixel = 0
+main.Active = true
+main.Draggable = true
+main.Parent = gui
+
+local mainRound = Instance.new("UICorner")
+mainRound.CornerRadius = UDim.new(0, 8)
+mainRound.Parent = main
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 22)
+title.BackgroundColor3 = Color3.new(0.1, 0.1, 0.16)
+title.Text = "Coord Tool"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextSize = 12
+title.Font = Enum.Font.GothamBold
+title.BorderSizePixel = 0
+title.Parent = main
+
+local titleRound = Instance.new("UICorner")
+titleRound.CornerRadius = UDim.new(0, 8)
+titleRound.Parent = title
+
+local left = Instance.new("Frame")
+left.Size = UDim2.new(0.46, 0, 0, 290)
+left.Position = UDim2.new(0.02, 0, 0, 27)
+left.BackgroundColor3 = Color3.new(0.08, 0.08, 0.12)
+left.BorderSizePixel = 0
+left.Parent = main
+
+local leftRound = Instance.new("UICorner")
+leftRound.CornerRadius = UDim.new(0, 6)
+leftRound.Parent = left
+
+local posTitle = Instance.new("TextLabel")
+posTitle.Size = UDim2.new(1, -4, 0, 16)
+posTitle.Position = UDim2.new(0, 2, 0, 3)
+posTitle.BackgroundTransparency = 1
+posTitle.Text = "Position"
+posTitle.TextColor3 = Color3.new(0.4, 0.6, 1)
+posTitle.TextSize = 10
+posTitle.Font = Enum.Font.GothamBold
+posTitle.Parent = left
+
+local xFrame = Instance.new("Frame")
+xFrame.Size = UDim2.new(1, -4, 0, 16)
+xFrame.Position = UDim2.new(0, 2, 0, 22)
+xFrame.BackgroundColor3 = Color3.new(0.12, 0.12, 0.18)
+xFrame.BorderSizePixel = 0
+xFrame.Parent = left
+
+local xRound = Instance.new("UICorner")
+xRound.CornerRadius = UDim.new(0, 3)
+xRound.Parent = xFrame
+
+local xLabel = Instance.new("TextLabel")
+xLabel.Size = UDim2.new(0, 12, 1, 0)
+xLabel.BackgroundTransparency = 1
+xLabel.Text = "X:"
+xLabel.TextColor3 = Color3.new(1, 1, 1)
+xLabel.TextSize = 8
+xLabel.Font = Enum.Font.GothamBold
+xLabel.Parent = xFrame
+
+local xVal = Instance.new("TextLabel")
+xVal.Size = UDim2.new(1, -14, 1, 0)
+xVal.Position = UDim2.new(0, 14, 0, 0)
+xVal.BackgroundTransparency = 1
+xVal.Text = "0"
+xVal.TextColor3 = Color3.new(0.67, 0.67, 0.67)
+xVal.TextSize = 8
+xVal.Font = Enum.Font.Code
+xVal.TextXAlignment = Enum.TextXAlignment.Left
+xVal.Parent = xFrame
+
+local yFrame = Instance.new("Frame")
+yFrame.Size = UDim2.new(1, -4, 0, 16)
+yFrame.Position = UDim2.new(0, 2, 0, 40)
+yFrame.BackgroundColor3 = Color3.new(0.12, 0.12, 0.18)
+yFrame.BorderSizePixel = 0
+yFrame.Parent = left
+
+local yRound = Instance.new("UICorner")
+yRound.CornerRadius = UDim.new(0, 3)
+yRound.Parent = yFrame
+
+local yLabel = Instance.new("TextLabel")
+yLabel.Size = UDim2.new(0, 12, 1, 0)
+yLabel.BackgroundTransparency = 1
+yLabel.Text = "Y:"
+yLabel.TextColor3 = Color3.new(1, 1, 1)
+yLabel.TextSize = 8
+yLabel.Font = Enum.Font.GothamBold
+yLabel.Parent = yFrame
+
+local yVal = Instance.new("TextLabel")
+yVal.Size = UDim2.new(1, -14, 1, 0)
+yVal.Position = UDim2.new(0, 14, 0, 0)
+yVal.BackgroundTransparency = 1
+yVal.Text = "0"
+yVal.TextColor3 = Color3.new(0.67, 0.67, 0.67)
+yVal.TextSize = 8
+yVal.Font = Enum.Font.Code
+yVal.TextXAlignment = Enum.TextXAlignment.Left
+yVal.Parent = yFrame
+
+local zFrame = Instance.new("Frame")
+zFrame.Size = UDim2.new(1, -4, 0, 16)
+zFrame.Position = UDim2.new(0, 2, 0, 58)
+zFrame.BackgroundColor3 = Color3.new(0.12, 0.12, 0.18)
+zFrame.BorderSizePixel = 0
+zFrame.Parent = left
+
+local zRound = Instance.new("UICorner")
+zRound.CornerRadius = UDim.new(0, 3)
+zRound.Parent = zFrame
+
+local zLabel = Instance.new("TextLabel")
+zLabel.Size = UDim2.new(0, 12, 1, 0)
+zLabel.BackgroundTransparency = 1
+zLabel.Text = "Z:"
+zLabel.TextColor3 = Color3.new(1, 1, 1)
+zLabel.TextSize = 8
+zLabel.Font = Enum.Font.GothamBold
+zLabel.Parent = zFrame
+
+local zVal = Instance.new("TextLabel")
+zVal.Size = UDim2.new(1, -14, 1, 0)
+zVal.Position = UDim2.new(0, 14, 0, 0)
+zVal.BackgroundTransparency = 1
+zVal.Text = "0"
+zVal.TextColor3 = Color3.new(0.67, 0.67, 0.67)
+zVal.TextSize = 8
+zVal.Font = Enum.Font.Code
+zVal.TextXAlignment = Enum.TextXAlignment.Left
+zVal.Parent = zFrame
+
+local copyBtn = Instance.new("TextButton")
+copyBtn.Size = UDim2.new(1, -4, 0, 20)
+copyBtn.Position = UDim2.new(0, 2, 0, 80)
+copyBtn.Text = "Copy Pos"
+copyBtn.BackgroundColor3 = Color3.new(0.14, 0.4, 0.28)
+copyBtn.TextColor3 = Color3.new(1, 1, 1)
+copyBtn.TextSize = 9
+copyBtn.Font = Enum.Font.GothamBold
+copyBtn.BorderSizePixel = 0
+copyBtn.Parent = left
+
+local copyRound = Instance.new("UICorner")
+copyRound.CornerRadius = UDim.new(0, 4)
+copyRound.Parent = copyBtn
+
+local modeLabel = Instance.new("TextLabel")
+modeLabel.Size = UDim2.new(1, -4, 0, 18)
+modeLabel.Position = UDim2.new(0, 2, 0, 108)
+modeLabel.BackgroundTransparency = 1
+modeLabel.Text = "Pick Mode"
+modeLabel.TextColor3 = Color3.new(1, 0.6, 0.28)
+modeLabel.TextSize = 9
+modeLabel.Font = Enum.Font.GothamBold
+modeLabel.Parent = left
+
+local currentMode = "JUST_TP"
+
+local mode1Frame = Instance.new("Frame")
+mode1Frame.Size = UDim2.new(1, -4, 0, 20)
+mode1Frame.Position = UDim2.new(0, 2, 0, 130)
+mode1Frame.BackgroundColor3 = Color3.new(0.18, 0.24, 0.18)
+mode1Frame.BorderSizePixel = 0
+mode1Frame.Parent = left
+
+local mode1Round = Instance.new("UICorner")
+mode1Round.CornerRadius = UDim.new(0, 4)
+mode1Round.Parent = mode1Frame
+
+local mode1Btn = Instance.new("TextButton")
+mode1Btn.Size = UDim2.new(1, 0, 1, 0)
+mode1Btn.BackgroundTransparency = 1
+mode1Btn.Text = "● Just TP"
+mode1Btn.TextColor3 = Color3.new(0.63, 0.63, 0.63)
+mode1Btn.TextSize = 8
+mode1Btn.Font = Enum.Font.Gotham
+mode1Btn.Parent = mode1Frame
+
+local mode2Frame = Instance.new("Frame")
+mode2Frame.Size = UDim2.new(1, -4, 0, 20)
+mode2Frame.Position = UDim2.new(0, 2, 0, 154)
+mode2Frame.BackgroundColor3 = Color3.new(0.14, 0.14, 0.2)
+mode2Frame.BorderSizePixel = 0
+mode2Frame.Parent = left
+
+local mode2Round = Instance.new("UICorner")
+mode2Round.CornerRadius = UDim.new(0, 4)
+mode2Round.Parent = mode2Frame
+
+local mode2Btn = Instance.new("TextButton")
+mode2Btn.Size = UDim2.new(1, 0, 1, 0)
+mode2Btn.BackgroundTransparency = 1
+mode2Btn.Text = "○ Fly Fast"
+mode2Btn.TextColor3 = Color3.new(0.63, 0.63, 0.63)
+mode2Btn.TextSize = 8
+mode2Btn.Font = Enum.Font.Gotham
+mode2Btn.Parent = mode2Frame
+
+local mode3Frame = Instance.new("Frame")
+mode3Frame.Size = UDim2.new(1, -4, 0, 20)
+mode3Frame.Position = UDim2.new(0, 2, 0, 178)
+mode3Frame.BackgroundColor3 = Color3.new(0.14, 0.14, 0.2)
+mode3Frame.BorderSizePixel = 0
+mode3Frame.Parent = left
+
+local mode3Round = Instance.new("UICorner")
+mode3Round.CornerRadius = UDim.new(0, 4)
+mode3Round.Parent = mode3Frame
+
+local mode3Btn = Instance.new("TextButton")
+mode3Btn.Size = UDim2.new(1, 0, 1, 0)
+mode3Btn.BackgroundTransparency = 1
+mode3Btn.Text = "○ Fly Slow"
+mode3Btn.TextColor3 = Color3.new(0.63, 0.63, 0.63)
+mode3Btn.TextSize = 8
+mode3Btn.Font = Enum.Font.Gotham
+mode3Btn.Parent = mode3Frame
+
+local right = Instance.new("Frame")
+right.Size = UDim2.new(0.46, 0, 0, 290)
+right.Position = UDim2.new(0.52, 0, 0, 27)
+right.BackgroundColor3 = Color3.new(0.08, 0.08, 0.12)
+right.BorderSizePixel = 0
+right.Parent = main
+
+local rightRound = Instance.new("UICorner")
+rightRound.CornerRadius = UDim.new(0, 6)
+rightRound.Parent = right
+
+local testTitle = Instance.new("TextLabel")
+testTitle.Size = UDim2.new(1, -4, 0, 16)
+testTitle.Position = UDim2.new(0, 2, 0, 3)
+testTitle.BackgroundTransparency = 1
+testTitle.Text = "Test Route"
+testTitle.TextColor3 = Color3.new(1, 0.4, 0.28)
+testTitle.TextSize = 10
+testTitle.Font = Enum.Font.GothamBold
+testTitle.Parent = right
+
+local coord1Label = Instance.new("TextLabel")
+coord1Label.Size = UDim2.new(1, -4, 0, 10)
+coord1Label.Position = UDim2.new(0, 2, 0, 22)
+coord1Label.BackgroundTransparency = 1
+coord1Label.Text = "1st coordinate"
+coord1Label.TextColor3 = Color3.new(0.55, 0.55, 0.55)
+coord1Label.TextSize = 7
+coord1Label.Font = Enum.Font.Gotham
+coord1Label.TextXAlignment = Enum.TextXAlignment.Left
+coord1Label.Parent = right
+
+local coord1 = Instance.new("TextBox")
+coord1.Size = UDim2.new(1, -4, 0, 16)
+coord1.Position = UDim2.new(0, 2, 0, 34)
+coord1.BackgroundColor3 = Color3.new(0.12, 0.12, 0.18)
+coord1.TextColor3 = Color3.new(1, 1, 1)
+coord1.TextSize = 8
+coord1.Font = Enum.Font.Code
+coord1.Text = ""
+coord1.PlaceholderText = "X,Y,Z"
+coord1.ClearTextOnFocus = false
+coord1.BorderSizePixel = 0
+coord1.Parent = right
+
+local coord1Round = Instance.new("UICorner")
+coord1Round.CornerRadius = UDim.new(0, 3)
+coord1Round.Parent = coord1
+
+local coord2Label = Instance.new("TextLabel")
+coord2Label.Size = UDim2.new(1, -4, 0, 10)
+coord2Label.Position = UDim2.new(0, 2, 0, 52)
+coord2Label.BackgroundTransparency = 1
+coord2Label.Text = "2nd coordinate"
+coord2Label.TextColor3 = Color3.new(0.55, 0.55, 0.55)
+coord2Label.TextSize = 7
+coord2Label.Font = Enum.Font.Gotham
+coord2Label.TextXAlignment = Enum.TextXAlignment.Left
+coord2Label.Parent = right
+
+local coord2 = Instance.new("TextBox")
+coord2.Size = UDim2.new(1, -4, 0, 16)
+coord2.Position = UDim2.new(0, 2, 0, 64)
+coord2.BackgroundColor3 = Color3.new(0.12, 0.12, 0.18)
+coord2.TextColor3 = Color3.new(1, 1, 1)
+coord2.TextSize = 8
+coord2.Font = Enum.Font.Code
+coord2.Text = ""
+coord2.PlaceholderText = "X,Y,Z"
+coord2.ClearTextOnFocus = false
+coord2.BorderSizePixel = 0
+coord2.Parent = right
+
+local coord2Round = Instance.new("UICorner")
+coord2Round.CornerRadius = UDim.new(0, 3)
+coord2Round.Parent = coord2
+
+local coord3Label = Instance.new("TextLabel")
+coord3Label.Size = UDim2.new(1, -4, 0, 10)
+coord3Label.Position = UDim2.new(0, 2, 0, 82)
+coord3Label.BackgroundTransparency = 1
+coord3Label.Text = "3rd coordinate"
+coord3Label.TextColor3 = Color3.new(0.55, 0.55, 0.55)
+coord3Label.TextSize = 7
+coord3Label.Font = Enum.Font.Gotham
+coord3Label.TextXAlignment = Enum.TextXAlignment.Left
+coord3Label.Parent = right
+
+local coord3 = Instance.new("TextBox")
+coord3.Size = UDim2.new(1, -4, 0, 16)
+coord3.Position = UDim2.new(0, 2, 0, 94)
+coord3.BackgroundColor3 = Color3.new(0.12, 0.12, 0.18)
+coord3.TextColor3 = Color3.new(1, 1, 1)
+coord3.TextSize = 8
+coord3.Font = Enum.Font.Code
+coord3.Text = ""
+coord3.PlaceholderText = "X,Y,Z"
+coord3.ClearTextOnFocus = false
+coord3.BorderSizePixel = 0
+coord3.Parent = right
+
+local coord3Round = Instance.new("UICorner")
+coord3Round.CornerRadius = UDim.new(0, 3)
+coord3Round.Parent = coord3
+
+local coord4Label = Instance.new("TextLabel")
+coord4Label.Size = UDim2.new(1, -4, 0, 10)
+coord4Label.Position = UDim2.new(0, 2, 0, 112)
+coord4Label.BackgroundTransparency = 1
+coord4Label.Text = "4th coordinate"
+coord4Label.TextColor3 = Color3.new(0.55, 0.55, 0.55)
+coord4Label.TextSize = 7
+coord4Label.Font = Enum.Font.Gotham
+coord4Label.TextXAlignment = Enum.TextXAlignment.Left
+coord4Label.Parent = right
+
+local coord4 = Instance.new("TextBox")
+coord4.Size = UDim2.new(1, -4, 0, 16)
+coord4.Position = UDim2.new(0, 2, 0, 124)
+coord4.BackgroundColor3 = Color3.new(0.12, 0.12, 0.18)
+coord4.TextColor3 = Color3.new(1, 1, 1)
+coord4.TextSize = 8
+coord4.Font = Enum.Font.Code
+coord4.Text = ""
+coord4.PlaceholderText = "X,Y,Z"
+coord4.ClearTextOnFocus = false
+coord4.BorderSizePixel = 0
+coord4.Parent = right
+
+local coord4Round = Instance.new("UICorner")
+coord4Round.CornerRadius = UDim.new(0, 3)
+coord4Round.Parent = coord4
+
+local coord5Label = Instance.new("TextLabel")
+coord5Label.Size = UDim2.new(1, -4, 0, 10)
+coord5Label.Position = UDim2.new(0, 2, 0, 142)
+coord5Label.BackgroundTransparency = 1
+coord5Label.Text = "5th coordinate"
+coord5Label.TextColor3 = Color3.new(0.55, 0.55, 0.55)
+coord5Label.TextSize = 7
+coord5Label.Font = Enum.Font.Gotham
+coord5Label.TextXAlignment = Enum.TextXAlignment.Left
+coord5Label.Parent = right
+
+local coord5 = Instance.new("TextBox")
+coord5.Size = UDim2.new(1, -4, 0, 16)
+coord5.Position = UDim2.new(0, 2, 0, 154)
+coord5.BackgroundColor3 = Color3.new(0.12, 0.12, 0.18)
+coord5.TextColor3 = Color3.new(1, 1, 1)
+coord5.TextSize = 8
+coord5.Font = Enum.Font.Code
+coord5.Text = ""
+coord5.PlaceholderText = "X,Y,Z"
+coord5.ClearTextOnFocus = false
+coord5.BorderSizePixel = 0
+coord5.Parent = right
+
+local coord5Round = Instance.new("UICorner")
+coord5Round.CornerRadius = UDim.new(0, 3)
+coord5Round.Parent = coord5
+
+-- coor 6
+local coord6Label = Instance.new("TextLabel")
+coord6Label.Size = UDim2.new(1, -4, 0, 10)
+coord6Label.Position = UDim2.new(0, 2, 0, 172)
+coord6Label.BackgroundTransparency = 1
+coord6Label.Text = "6 coordinate"
+coord6Label.TextColor3 = Color3.new(0.55, 0.55, 0.55)
+coord6Label.TextSize = 7
+coord6Label.Font = Enum.Font.Gotham
+coord6Label.TextXAlignment = Enum.TextXAlignment.Left
+coord6Label.Parent = right
+
+local coord6 = Instance.new("TextBox")
+coord6.Size = UDim2.new(1, -4, 0, 16)
+coord6.Position = UDim2.new(0, 2, 0, 184)
+coord6.BackgroundColor3 = Color3.new(0.12, 0.12, 0.18)
+coord6.TextColor3 = Color3.new(1, 1, 1)
+coord6.TextSize = 8
+coord6.Font = Enum.Font.Code
+coord6.Text = ""
+coord6.PlaceholderText = "X,Y,Z"
+coord6.ClearTextOnFocus = false
+coord6.BorderSizePixel = 0
+coord6.Parent = right
+
+local coord6Round = Instance.new("UICorner")
+coord6Round.CornerRadius = UDim.new(0, 3)
+coord6Round.Parent = coord6
+
+-- coor 7
+
+local coord7Label = Instance.new("TextLabel")
+coord7Label.Size = UDim2.new(1, -4, 0, 10)
+coord7Label.Position = UDim2.new(0, 2, 0, 202)
+coord7Label.BackgroundTransparency = 1
+coord7Label.Text = "7 coordinate"
+coord7Label.TextColor3 = Color3.new(0.55, 0.55, 0.55)
+coord7Label.TextSize = 7
+coord7Label.Font = Enum.Font.Gotham
+coord7Label.TextXAlignment = Enum.TextXAlignment.Left
+coord7Label.Parent = right
+
+local coord7 = Instance.new("TextBox")
+coord7.Size = UDim2.new(1, -4, 0, 16)
+coord7.Position = UDim2.new(0, 2, 0, 214)
+coord7.BackgroundColor3 = Color3.new(0.12, 0.12, 0.18)
+coord7.TextColor3 = Color3.new(1, 1, 1)
+coord7.TextSize = 8
+coord7.Font = Enum.Font.Code
+coord7.Text = ""
+coord7.PlaceholderText = "X,Y,Z"
+coord7.ClearTextOnFocus = false
+coord7.BorderSizePixel = 0
+coord7.Parent = right
+
+local coord7Round = Instance.new("UICorner")
+coord7Round.CornerRadius = UDim.new(0, 3)
+coord7Round.Parent = coord7
+
+-- coor 8
+
+local coord8Label = Instance.new("TextLabel")
+coord8Label.Size = UDim2.new(1, -4, 0, 10)
+coord8Label.Position = UDim2.new(0, 2, 0, 232)
+coord8Label.BackgroundTransparency = 1
+coord8Label.Text = "8 coordinate"
+coord8Label.TextColor3 = Color3.new(0.55, 0.55, 0.55)
+coord8Label.TextSize = 7
+coord8Label.Font = Enum.Font.Gotham
+coord8Label.TextXAlignment = Enum.TextXAlignment.Left
+coord8Label.Parent = right
+
+local coord8 = Instance.new("TextBox")
+coord8.Size = UDim2.new(1, -4, 0, 16)
+coord8.Position = UDim2.new(0, 2, 0, 244)
+coord8.BackgroundColor3 = Color3.new(0.12, 0.12, 0.18)
+coord8.TextColor3 = Color3.new(1, 1, 1)
+coord8.TextSize = 8
+coord8.Font = Enum.Font.Code
+coord8.Text = ""
+coord8.PlaceholderText = "X,Y,Z"
+coord8.ClearTextOnFocus = false
+coord8.BorderSizePixel = 0
+coord8.Parent = right
+
+local coord8Round = Instance.new("UICorner")
+coord8Round.CornerRadius = UDim.new(0, 3)
+coord8Round.Parent = coord8
+
+-- tutup
+
+local startBtn = Instance.new("TextButton")
+startBtn.Size = UDim2.new(0.45, 0, 0, 20)
+startBtn.Position = UDim2.new(0.02, 0, 0, 265)
+startBtn.Text = "Start"
+startBtn.BackgroundColor3 = Color3.new(0.28, 0.51, 0.28)
+startBtn.TextColor3 = Color3.new(1, 1, 1)
+startBtn.TextSize = 9
+startBtn.Font = Enum.Font.GothamBold
+startBtn.BorderSizePixel = 0
+startBtn.Parent = right
+
+local startRound = Instance.new("UICorner")
+startRound.CornerRadius = UDim.new(0, 4)
+startRound.Parent = startBtn
+
+local stopBtn = Instance.new("TextButton")
+stopBtn.Size = UDim2.new(0.45, 0, 0, 20)
+stopBtn.Position = UDim2.new(0.53, 0, 0, 265)
+stopBtn.Text = "Stop"
+stopBtn.BackgroundColor3 = Color3.new(0.51, 0.28, 0.28)
+stopBtn.TextColor3 = Color3.new(1, 1, 1)
+stopBtn.TextSize = 9
+stopBtn.Font = Enum.Font.GothamBold
+stopBtn.BorderSizePixel = 0
+stopBtn.Parent = right
+
+local stopRound = Instance.new("UICorner")
+stopRound.CornerRadius = UDim.new(0, 4)
+stopRound.Parent = stopBtn
+
+local char = plr.Character or plr.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+local running = false
+local flying = false
+
+local function updatePos()
+    local pos = hrp.Position
+    xVal.Text = tostring(math.floor(pos.X))
+    yVal.Text = tostring(math.floor(pos.Y))
+    zVal.Text = tostring(math.floor(pos.Z))
+end
+
+copyBtn.MouseButton1Click:Connect(function()
+    local pos = hrp.Position
+    local str = tostring(math.floor(pos.X)) .. "," .. tostring(math.floor(pos.Y)) .. "," .. tostring(math.floor(pos.Z))
+    if setclipboard then
+        setclipboard(str)
+        copyBtn.Text = "Copied!"
+        wait(1)
+        copyBtn.Text = "Copy Pos"
+    end
+end)
+
+mode1Btn.MouseButton1Click:Connect(function()
+    currentMode = "JUST_TP"
+    mode1Btn.Text = "● Just TP"
+    mode1Frame.BackgroundColor3 = Color3.new(0.18, 0.24, 0.18)
+    mode2Btn.Text = "○ Fly Fast"
+    mode2Frame.BackgroundColor3 = Color3.new(0.14, 0.14, 0.2)
+    mode3Btn.Text = "○ Fly Slow"
+    mode3Frame.BackgroundColor3 = Color3.new(0.14, 0.14, 0.2)
+end)
+
+mode2Btn.MouseButton1Click:Connect(function()
+    currentMode = "FLY_FAST"
+    mode1Btn.Text = "○ Just TP"
+    mode1Frame.BackgroundColor3 = Color3.new(0.14, 0.14, 0.2)
+    mode2Btn.Text = "● Fly Fast"
+    mode2Frame.BackgroundColor3 = Color3.new(0.18, 0.24, 0.18)
+    mode3Btn.Text = "○ Fly Slow"
+    mode3Frame.BackgroundColor3 = Color3.new(0.14, 0.14, 0.2)
+end)
+
+mode3Btn.MouseButton1Click:Connect(function()
+    currentMode = "FLY_SLOW"
+    mode1Btn.Text = "○ Just TP"
+    mode1Frame.BackgroundColor3 = Color3.new(0.14, 0.14, 0.2)
+    mode2Btn.Text = "○ Fly Fast"
+    mode2Frame.BackgroundColor3 = Color3.new(0.14, 0.14, 0.2)
+    mode3Btn.Text = "● Fly Slow"
+    mode3Frame.BackgroundColor3 = Color3.new(0.18, 0.24, 0.18)
+end)
+
+local function parseCoords(text)
+    local nums = {}
+    for num in string.gmatch(text, "%-?%d+") do
+        table.insert(nums, tonumber(num))
+    end
+    if #nums >= 3 then
+        return Vector3.new(nums[1], nums[2], nums[3])
+    end
+    return nil
+end
+
+local function goTo(pos)
+    if currentMode == "JUST_TP" then
+        hrp.CFrame = CFrame.new(pos)
+    elseif currentMode == "FLY_FAST" then
+        flying = true
+        local bv = Instance.new("BodyVelocity")
+        bv.MaxForce = Vector3.new(4000, 4000, 4000)
+        bv.Velocity = Vector3.new(0, 0, 0)
+        bv.Parent = hrp
+        
+        while flying and (hrp.Position - pos).Magnitude > 8 do
+            local dir = (pos - hrp.Position).Unit
+            bv.Velocity = dir * 80
+            wait(0.1)
+        end
+        
+        bv:Destroy()
+        flying = false
+        hrp.CFrame = CFrame.new(pos)
+    elseif currentMode == "FLY_SLOW" then
+        flying = true
+        local bv = Instance.new("BodyVelocity")
+        bv.MaxForce = Vector3.new(4000, 4000, 4000)
+        bv.Velocity = Vector3.new(0, 0, 0)
+        bv.Parent = hrp
+        
+        while flying and (hrp.Position - pos).Magnitude > 8 do
+            local dir = (pos - hrp.Position).Unit
+            bv.Velocity = dir * 25
+            wait(0.1)
+        end
+        
+        bv:Destroy()
+        flying = false
+        hrp.CFrame = CFrame.new(pos)
+    end
+end
+
+local coords = {coord1, coord2, coord3, coord4, coord5, coord6, coord7, coord8}
+
+startBtn.MouseButton1Click:Connect(function()
+    if running then return end
+    running = true
+    startBtn.Text = "Running..."
+    
+    spawn(function()
+        for i = 1, #coords do
+            if not running then break end
+            
+            local box = coords[i]
+            if box.Text ~= "" then
+                local targetPos = parseCoords(box.Text)
+                if targetPos then
+                    startBtn.Text = "Going " .. i
+                    goTo(targetPos)
+                    
+                    while (hrp.Position - targetPos).Magnitude > 10 and running do
+                        wait(0.5)
+                    end
+                    
+                    startBtn.Text = "Reached " .. i
+                    wait(1)
+                end
+            end
+        end
+        
+        if running then
+            startBtn.Text = "Complete!"
+            wait(2)
+            startBtn.Text = "Start"
+            running = false
+        end
+    end)
+end)
+
+stopBtn.MouseButton1Click:Connect(function()
+    running = false
+    flying = false
+    startBtn.Text = "Start"
+end)
+
+spawn(function()
+    while true do
+        updatePos()
+        wait(1)
+    end
+end)
