@@ -23,8 +23,8 @@ task.spawn(function()
 	end
 end)
 
--- Delay intro 8 detik
-task.wait(8)
+-- Delay intro 3 detik
+task.wait(3)
 intro:Destroy()
 
 -- Update character reference
