@@ -1,0 +1,229 @@
+local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "YagatawGUI_Arsapp"
+gui.ResetOnSpawn = false
+
+-- Intro Rainbow Text
+local intro = Instance.new("TextLabel", gui)
+intro.Size = UDim2.new(1, 0, 0, 50)
+intro.Position = UDim2.new(0, 0, 0.4, 0)
+intro.Text = "🗻 Auto Summit Script Yagataw (Belum fix auto)"
+intro.Font = Enum.Font.GothamBlack 
+intro.TextSize = 32
+intro.BackgroundTransparency = 1
+intro.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Rainbow effect
+task.spawn(function()
+	while intro and intro.Parent do
+		for h = 0, 1, 0.01 do
+			intro.TextColor3 = Color3.fromHSV(h, 1, 1)
+			task.wait(0.03)
+		end
+	end
+end)
+
+-- Delay intro 8 detik
+task.wait(8)
+intro:Destroy()
+
+-- Update character reference
+local char, hrp
+local function updateCharacter()
+	char = player.Character or player.CharacterAdded:Wait()
+	hrp = char:WaitForChild("HumanoidRootPart")
+end
+updateCharacter()
+
+-- Main Frame
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 260, 0, 400)
+frame.Position = UDim2.new(0, 20, 0.4, -200)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.Active = true
+frame.Draggable = true
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
+
+-- Minimize Button
+local minimizeBtn = Instance.new("TextButton", frame)
+minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+minimizeBtn.Position = UDim2.new(0, 5, 0, 5)
+minimizeBtn.Text = "-"
+minimizeBtn.Font = Enum.Font.GothamBold
+minimizeBtn.TextSize = 18
+minimizeBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+minimizeBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", minimizeBtn).CornerRadius = UDim.new(0, 6)
+
+-- Close Button
+local closeBtn = minimizeBtn:Clone()
+closeBtn.Text = "✖"
+closeBtn.Position = UDim2.new(0, 40, 0, 5)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeBtn.Parent = frame
+closeBtn.MouseButton1Click:Connect(function()
+	gui:Destroy()
+end)
+
+-- Title
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, -80, 0, 40)
+title.Position = UDim2.new(0, 80, 0, 0)
+title.Text = "Gunung Yamin Menu"
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Rainbow Judul
+task.spawn(function()
+	while title and title.Parent do
+		for h = 0, 1, 0.01 do
+			title.TextColor3 = Color3.fromHSV(h, 1, 1)
+			task.wait(0.03)
+		end
+	end
+end)
+
+-- Tab & Page
+local tabHolder = Instance.new("Frame", frame)
+tabHolder.Size = UDim2.new(1, 0, 0, 30)
+tabHolder.Position = UDim2.new(0, 0, 0, 45)
+tabHolder.BackgroundTransparency = 1
+
+local teleportTabBtn = Instance.new("TextButton", tabHolder)
+teleportTabBtn.Size = UDim2.new(0.5, -4, 1, 0)
+teleportTabBtn.Text = "Teleport"
+teleportTabBtn.Font = Enum.Font.GothamBold
+teleportTabBtn.TextSize = 16
+teleportTabBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+teleportTabBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", teleportTabBtn).CornerRadius = UDim.new(0, 6)
+
+local autoTabBtn = teleportTabBtn:Clone()
+autoTabBtn.Text = "Auto Summit"
+autoTabBtn.Position = UDim2.new(0.5, 4, 0, 0)
+autoTabBtn.Parent = tabHolder
+
+local pageHolder = Instance.new("Frame", frame)
+pageHolder.Size = UDim2.new(1, -20, 1, -90)
+pageHolder.Position = UDim2.new(0, 10, 0, 85)
+pageHolder.BackgroundTransparency = 1
+
+-- Teleport Page
+local teleportPage = Instance.new("Frame", pageHolder)
+teleportPage.Size = UDim2.new(1, 0, 1, 0)
+teleportPage.Visible = true
+teleportPage.BackgroundTransparency = 1
+
+local autoPage = teleportPage:Clone()
+autoPage.Visible = false
+autoPage.Parent = pageHolder
+for _, c in ipairs(autoPage:GetChildren()) do c:Destroy() end
+
+-- Koordinat Camp Terbaru
+local locations = {
+	{"Base Camp", Vector3.new(2285,2,735)},
+	{"Puncak", Vector3.new(-723,915,-835)},
+	{"Summit", Vector3.new(-695,926,-730)},
+}
+
+-- Teleport Buttons
+for i, loc in ipairs(locations) do
+	local btn = Instance.new("TextButton", teleportPage)
+	btn.Size = UDim2.new(1, 0, 0, 28)
+	btn.Position = UDim2.new(0, 0, 0, (i - 1) * 32)
+	btn.Text = loc[1]
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 15
+	btn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+	btn.MouseButton1Click:Connect(function()
+		if hrp then hrp.CFrame = CFrame.new(loc[2]) end
+	end)
+end
+
+-- AUTO SUMMIT SYSTEM
+local autoBtn = Instance.new("TextButton", autoPage)
+autoBtn.Size = UDim2.new(1, 0, 0, 40)
+autoBtn.Text = "🔁 AUTO SUMMIT [OFF]"
+autoBtn.Font = Enum.Font.GothamBold
+autoBtn.TextSize = 18
+autoBtn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+autoBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", autoBtn).CornerRadius = UDim.new(0, 8)
+
+local progress = Instance.new("Frame", autoPage)
+progress.Size = UDim2.new(0, 0, 0, 6)
+progress.Position = UDim2.new(0, 0, 0, 45)
+progress.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+Instance.new("UICorner", progress).CornerRadius = UDim.new(1, 0)
+
+local autoRunning = false
+
+function startAutoSummit()
+	autoBtn.Text = "🔁 AUTO SUMMIT [ON]"
+	while autoRunning do
+		for i = 2, #locations do
+			if not autoRunning then break end
+			hrp.CFrame = CFrame.new(locations[i][2])
+			for j = 1, 10 do
+				if not autoRunning then break end
+				progress.Size = UDim2.new(j / 10, 0, 0, 6)
+				hrp.Velocity = Vector3.new(0, 50, 0)
+				task.wait(0.2)
+				hrp.CFrame = hrp.CFrame * CFrame.new(0, 0, j % 2 == 0 and -5 or 5)
+				task.wait(0.8)
+			end
+		end
+		if autoRunning then
+			hrp.CFrame = CFrame.new(locations[1][2]) -- Base Camp
+			task.wait(1)
+		end
+	end
+	autoBtn.Text = "🔁 AUTO SUMMIT [OFF]"
+	progress.Size = UDim2.new(0, 0, 0, 6)
+end
+
+autoBtn.MouseButton1Click:Connect(function()
+	autoRunning = not autoRunning
+	if autoRunning then
+		startAutoSummit()
+	end
+end)
+
+-- TAB SWITCH
+teleportTabBtn.MouseButton1Click:Connect(function()
+	teleportPage.Visible = true
+	autoPage.Visible = false
+end)
+autoTabBtn.MouseButton1Click:Connect(function()
+	teleportPage.Visible = false
+	autoPage.Visible = true
+end)
+
+-- Minimize
+local minimized = false
+minimizeBtn.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	if minimized then
+		frame:TweenSize(UDim2.new(0, 260, 0, 40), "Out", "Quad", 0.25, true)
+		tabHolder.Visible = false
+		pageHolder.Visible = false
+	else
+		frame:TweenSize(UDim2.new(0, 260, 0, 400), "Out", "Quad", 0.25, true)
+		tabHolder.Visible = true
+		pageHolder.Visible = true
+	end
+end)
+
+-- ON RESPAWN: Update hrp dan auto lanjut
+player.CharacterAdded:Connect(function()
+	updateCharacter()
+	if autoRunning then
+		task.wait(1)
+		startAutoSummit()
+	end
+end)
