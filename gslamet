@@ -1,0 +1,47 @@
+-- Auto-teleport and walk script with loop • LocalScript (StarterPlayerScripts)
+
+local player = game.Players.LocalPlayer
+
+-- All teleport coordinates
+local teleportPoints = {
+    Vector3.new(-464, 2253, -1080),   -- Pos 1
+    Vector3.new(-1600, 2513, -1283),  -- Pos 2
+    Vector3.new(-2424, 2690, -1205),  -- Pos 3
+    Vector3.new(-2930, 2789, -1012),  -- Pos 4
+    Vector3.new(-3497, 2909,  -941),  -- Pos 5
+    Vector3.new(-4042, 3041,  -964),  -- Pos 6
+    Vector3.new(-4287, 3094,  -932),  -- Pos 7
+    Vector3.new(-4669, 3171,  -910),  -- Pos 8
+    Vector3.new(-5418, 3431, -1178),  -- Puncak (updated)
+}
+
+-- Final walking target after last teleport
+local walkTarget = Vector3.new(-5418, 3425, -1170)
+
+-- Wait for the character, humanoid, and root part
+local function getCharacterParts()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local root = char:WaitForChild("HumanoidRootPart")
+    local humanoid = char:WaitForChild("Humanoid")
+    return root, humanoid
+end
+
+-- Looping teleport + walk routine
+task.defer(function()
+    while true do
+        local root, humanoid = getCharacterParts()
+
+        -- Teleport through all points
+        for i, pos in ipairs(teleportPoints) do
+            root.CFrame = CFrame.new(pos)
+            task.wait(5)
+
+            -- If last teleport (Puncak), walk to final point
+            if i == #teleportPoints then
+                humanoid:MoveTo(walkTarget)
+                humanoid.MoveToFinished:Wait()
+                task.wait(5) -- wait after arriving
+            end
+        end
+    end
+end)
