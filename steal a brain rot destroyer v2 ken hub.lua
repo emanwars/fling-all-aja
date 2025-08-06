@@ -7,17 +7,7 @@ task.defer(function()
     local player = Players.LocalPlayer
     local PlayerGui = player:WaitForChild("PlayerGui")
 
-    local discordLink = "https://discord.gg/C5N4Y4cqqN"
 
-    local translations = {
-        ["en"] = { join = "Join our Discord!", copy = "Copy Link", copied = "Copied Discord Link!" },
-        ["ar"] = { join = "انضم إلى ديسكوردنا!", copy = "نسخ الرابط", copied = "تم نسخ رابط الديسكورد!" },
-        ["fil"] = { join = "Sumali sa aming Discord!", copy = "Kopyahin ang Link", copied = "Nai-copy ang Discord Link!" },
-        ["pt"] = { join = "Junte-se ao nosso Discord!", copy = "Copiar Link", copied = "Link do Discord copiado!" },
-        ["es"] = { join = "¡Únete a nuestro Discord!", copy = "Copiar enlace", copied = "¡Enlace de Discord copiado!" },
-        ["fr"] = { join = "Rejoignez notre Discord !", copy = "Copier le lien", copied = "Lien Discord copié !" },
-        ["ru"] = { join = "Присоединяйтесь к нашему Discord!", copy = "Скопировать ссылку", copied = "Ссылка Discord скопирована!" },
-    }
 
     local locale = player.LocaleId:sub(1,2):lower()
     local texts = translations[locale] or translations["en"]
@@ -2330,3 +2320,4 @@ task.spawn(function()
         task.wait(0.2)
     end
 end)
+
