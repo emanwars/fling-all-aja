@@ -1,0 +1,35 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+
+if not character.PrimaryPart then
+    character:WaitForChild("HumanoidRootPart") 
+end
+
+
+local function teleportToCheckpoints()
+    local checkpointsFolder = game.Workspace:FindFirstChild("Checkpoints") 
+
+    if not checkpointsFolder then
+        warn("Checkpoints folder not found in Workspace.")
+        return
+    end
+
+    
+    for i = 1, 217 do
+        local checkpointPart = checkpointsFolder:FindFirstChild(tostring(i))
+        if checkpointPart and checkpointPart:IsA("BasePart") then
+            
+            local airOffset = 2 -- Offset in studs
+            local teleportPosition = checkpointPart.Position + Vector3.new(0, checkpointPart.Size.Y / 2 + airOffset, 0)
+
+            
+            character:SetPrimaryPartCFrame(CFrame.new(teleportPosition))
+            wait(0.5) 
+        else
+            warn(i .. " not found in Checkpoints folder.")
+        end
+    end
+end
+
+teleportToCheckpoints()
