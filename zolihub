@@ -1,0 +1,1806 @@
+-- Zoli Hub 2.0 - Универсальный чит для Roblox с поддержкой функций
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
+local TeleportService = game:GetService("TeleportService")
+local Lighting = game:GetService("Lighting")
+local LocalPlayer = Players.LocalPlayer
+local Camera = game:GetService("Workspace").CurrentCamera
+
+-- Конфигурации
+local config = {
+    theme = "Neon",
+    flySpeed = 400,
+    walkSpeed = 400,
+    jumpPower = 100,
+    superJumpPower = 200,
+    auraRange = 10,
+    aimbotSmoothness = 0.1,
+    autoFarm = false,
+    autoRespawn = false,
+    autoClicker = false,
+    clickTPSpeed = 20,
+    fovValue = 70,
+    customGravity = 196.2,
+    splashScreen = true,
+    autoLoot = false,
+    infAmmo = false,
+    antiAim = false,
+    wallHack = false,
+    silentAim = false,
+    headshotAim = false,
+    bodyAim = false,
+    teamESP = false,
+    enemyESP = false,
+    itemESP = false,
+    fastAttack = false,
+    oneHitKill = false,
+    antiBan = false,
+    instantRespawn = false,
+    unlockZoom = false,
+    dayNightToggle = false,
+    spinCharacter = false,
+    rainbowCharacter = false,
+    autoSteal = false,
+    autoLockBase = false,
+    infiniteCash = false,
+    antiKick = false,
+    autoHeal = false,
+    espTracers = false,
+    superJump = false,
+    invisibleCamera = false,
+    autoInteract = false,
+    speedBoost = false,
+    speedBoostMultiplier = 2,
+    hotkeys = {
+        ToggleUI = Enum.KeyCode.RightControl,
+        AltToggleUI = Enum.KeyCode.F,
+        ClickTP = Enum.KeyCode.V,
+        AutoClicker = Enum.KeyCode.C,
+        SpeedBoost = Enum.KeyCode.LeftShift
+    },
+    damageMultiplier = 1
+}
+
+local themes = {
+    Dark = {Bg = Color3.fromRGB(20, 20, 20), Button = Color3.fromRGB(60, 60, 60), Text = Color3.fromRGB(255, 255, 255), Accent = Color3.fromRGB(0, 170, 255)},
+    Light = {Bg = Color3.fromRGB(240, 240, 240), Button = Color3.fromRGB(200, 200, 200), Text = Color3.fromRGB(0, 0, 0), Accent = Color3.fromRGB(0, 120, 200)},
+    Neon = {Bg = Color3.fromRGB(10, 10, 30), Button = Color3.fromRGB(50, 50, 100), Text = Color3.fromRGB(200, 255, 200), Accent = Color3.fromRGB(255, 0, 255)}
+}
+
+-- Сохранение/загрузка конфигурации
+local function saveConfig()
+    if writefile then
+        pcall(function()
+            writefile("ZoliHubConfig.json", HttpService:JSONEncode(config))
+            print("Config saved")
+        end)
+    end
+end
+
+local function loadConfig()
+    if readfile and isfile and isfile("ZoliHubConfig.json") then
+        pcall(function()
+            config = HttpService:JSONDecode(readfile("ZoliHubConfig.json"))
+            print("Config loaded")
+        end)
+    end
+end
+
+loadConfig()
+
+-- Создание GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ZoliHub"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+ScreenGui.Parent = LocalPlayer.PlayerGui
+print("ScreenGui created")
+
+-- Уведомления
+local NotificationLabel = Instance.new("TextLabel")
+NotificationLabel.Size = UDim2.new(0, 300, 0, 50)
+NotificationLabel.Position = UDim2.new(0.5, -150, 0, 10)
+NotificationLabel.BackgroundTransparency = 0.5
+NotificationLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+NotificationLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+NotificationLabel.TextSize = 14
+NotificationLabel.Font = Enum.Font.Gotham
+NotificationLabel.Text = "Zoli Hub 2.0 Loaded"
+NotificationLabel.TextWrapped = true
+NotificationLabel.ZIndex = 1000
+NotificationLabel.Parent = ScreenGui
+print("NotificationLabel created")
+
+local function showNotification(text, duration)
+    NotificationLabel.Text = text
+    NotificationLabel.Visible = true
+    spawn(function()
+        wait(duration or 3)
+        NotificationLabel.Visible = false
+    end)
+    print("Notification: " .. text)
+end
+
+-- Кнопка для мобильных устройств
+local MobileToggleButton = Instance.new("TextButton")
+MobileToggleButton.Size = UDim2.new(0, 60, 0, 60)
+MobileToggleButton.Position = UDim2.new(0, 10, 0, 70)
+MobileToggleButton.BackgroundColor3 = themes[config.theme].Button
+MobileToggleButton.Text = "Zoli"
+MobileToggleButton.TextColor3 = themes[config.theme].Text
+MobileToggleButton.TextSize = 16
+MobileToggleButton.Font = Enum.Font.Gotham
+MobileToggleButton.ZIndex = 1001
+MobileToggleButton.Parent = ScreenGui
+local UICornerMobile = Instance.new("UICorner")
+UICornerMobile.CornerRadius = UDim.new(0, 10)
+UICornerMobile.Parent = MobileToggleButton
+print("MobileToggleButton created")
+
+-- Заставка
+if config.splashScreen then
+    local Splash = Instance.new("Frame")
+    Splash.Size = UDim2.new(1, 0, 1, 0)
+    Splash.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    Splash.ZIndex = 2000
+    Splash.Parent = ScreenGui
+    local SplashText = Instance.new("TextLabel")
+    SplashText.Size = UDim2.new(0.5, 0, 0.2, 0)
+    SplashText.Position = UDim2.new(0.25, 0, 0.4, 0)
+    SplashText.BackgroundTransparency = 1
+    SplashText.Text = "Zoli Hub 2.0"
+    SplashText.TextColor3 = themes[config.theme].Accent
+    SplashText.TextSize = 50
+    SplashText.TextStrokeTransparency = 0.7
+    SplashText.Font = Enum.Font.SourceSansBold
+    SplashText.ZIndex = 2001
+    SplashText.Parent = Splash
+    print("Splash screen created")
+    local tween = TweenService:Create(SplashText, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {TextTransparency = 0, TextStrokeTransparency = 0})
+    tween:Play()
+    wait(2)
+    local fadeOut = TweenService:Create(Splash, TweenInfo.new(1, Enum.EasingStyle.Sine), {BackgroundTransparency = 1})
+    fadeOut:Play()
+    wait(1)
+    Splash:Destroy()
+    print("Splash screen removed")
+end
+
+-- Основной фрейм
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 400, 0, 600)
+Frame.Position = UDim2.new(0.5, -200, 0.5, -300)
+Frame.BackgroundColor3 = themes[config.theme].Bg
+Frame.BorderSizePixel = 0
+Frame.BackgroundTransparency = 0.1
+Frame.ZIndex = 1000
+Frame.Parent = ScreenGui
+Frame.Visible = false
+Frame.ClipsDescendants = false
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = Frame
+print("Main Frame created")
+
+-- Градиент фона
+local UIGradient = Instance.new("UIGradient")
+UIGradient.Color = ColorSequence.new(themes[config.theme].Bg, themes[config.theme].Accent)
+UIGradient.Rotation = 45
+UIGradient.Parent = Frame
+
+-- Обработчики для открытия/закрытия UI
+MobileToggleButton.MouseButton1Click:Connect(function()
+    Frame.Visible = not Frame.Visible
+    showNotification("UI Toggled: " .. (Frame.Visible and "ON" or "OFF"))
+    print("MobileToggleButton clicked, UI Visible: " .. tostring(Frame.Visible))
+end)
+
+MobileToggleButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch then
+        Frame.Visible = not Frame.Visible
+        showNotification("UI Toggled: " .. (Frame.Visible and "ON" or "OFF"))
+        print("MobileToggleButton touched, UI Visible: " .. tostring(Frame.Visible))
+    end
+end)
+
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if not gameProcessedEvent then
+        if input.KeyCode == config.hotkeys.ToggleUI or input.KeyCode == config.hotkeys.AltToggleUI then
+            Frame.Visible = not Frame.Visible
+            showNotification("UI Toggled: " .. (Frame.Visible and "ON" or "OFF"))
+            print("UI Toggled by hotkey: " .. tostring(input.KeyCode) .. ", Visible: " .. tostring(Frame.Visible))
+        end
+    end
+end)
+
+-- Заголовок
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 50)
+Title.BackgroundTransparency = 1
+Title.Text = "Zoli Hub 2.0 by Bebrovich411"
+Title.TextColor3 = themes[config.theme].Text
+Title.TextSize = 24
+Title.Font = Enum.Font.GothamBold
+Title.ZIndex = 501
+Title.Parent = Frame
+print("Title created")
+
+-- Поле поиска
+local SearchBox = Instance.new("TextBox")
+SearchBox.Size = UDim2.new(0.95, 0, 0, 30)
+SearchBox.Position = UDim2.new(0.025, 0, 0, 60)
+SearchBox.BackgroundColor3 = themes[config.theme].Button
+SearchBox.Text = "Search..."
+SearchBox.TextColor3 = themes[config.theme].Text
+SearchBox.TextSize = 14
+SearchBox.Font = Enum.Font.Gotham
+SearchBox.ZIndex = 600
+SearchBox.Parent = Frame
+local UICornerSearch = Instance.new("UICorner")
+UICornerSearch.CornerRadius = UDim.new(0, 8)
+UICornerSearch.Parent = SearchBox
+print("Search TextBox created")
+
+-- Список для прокрутки
+local ScrollingFrame = Instance.new("ScrollingFrame")
+ScrollingFrame.Size = UDim2.new(0.95, 0, 0.78, 0)
+ScrollingFrame.Position = UDim2.new(0.025, 0, 0, 100)
+ScrollingFrame.BackgroundTransparency = 1
+ScrollingFrame.ScrollBarThickness = 5
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 4000)
+ScrollingFrame.ZIndex = 502
+ScrollingFrame.Parent = Frame
+print("ScrollingFrame created")
+
+-- Функция для создания кнопок
+local function createButton(name, yPos, callback)
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(0.9, 0, 0, 40)
+    Button.Position = UDim2.new(0.05, 0, 0, yPos)
+    Button.BackgroundColor3 = themes[config.theme].Button
+    Button.Text = name
+    Button.TextColor3 = themes[config.theme].Text
+    Button.TextSize = 16
+    Button.Font = Enum.Font.Gotham
+    Button.ZIndex = 503
+    Button.Parent = ScrollingFrame
+    local UICornerBtn = Instance.new("UICorner")
+    UICornerBtn.CornerRadius = UDim.new(0, 8)
+    UICornerBtn.Parent = Button
+    Button.MouseButton1Click:Connect(function()
+        local tween = TweenService:Create(Button, TweenInfo.new(0.2), {BackgroundColor3 = themes[config.theme].Accent})
+        tween:Play()
+        wait(0.2)
+        tween = TweenService:Create(Button, TweenInfo.new(0.2), {BackgroundColor3 = themes[config.theme].Button})
+        tween:Play()
+        pcall(callback)
+        print("Button clicked: " .. name)
+    end)
+    print("Button created: " .. name)
+    return Button
+end
+
+-- Функция для создания текстовых полей
+local function createTextBox(name, yPos, defaultText, parent)
+    local TextBox = Instance.new("TextBox")
+    TextBox.Size = UDim2.new(0.9, 0, 0, 30)
+    TextBox.Position = UDim2.new(0.05, 0, 0, yPos)
+    TextBox.BackgroundColor3 = themes[config.theme].Button
+    TextBox.Text = defaultText
+    TextBox.TextColor3 = themes[config.theme].Text
+    TextBox.TextSize = 14
+    TextBox.Font = Enum.Font.Gotham
+    TextBox.ZIndex = 603
+    TextBox.Parent = parent
+    local UICornerBox = Instance.new("UICorner")
+    UICornerBox.CornerRadius = UDim.new(0, 8)
+    UICornerBox.Parent = TextBox
+    print("TextBox created: " .. name)
+    return TextBox
+end
+
+-- Поиск по кнопкам
+SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+    local searchText = SearchBox.Text:lower()
+    for _, button in pairs(ScrollingFrame:GetChildren()) do
+        if button:IsA("TextButton") or button:IsA("TextBox") then
+            button.Visible = searchText == "" or searchText == "search..." or button.Text:lower():find(searchText) ~= nil
+        end
+    end
+    print("Search: " .. searchText)
+end)
+
+SearchBox.Focused:Connect(function()
+    if SearchBox.Text == "Search..." then
+        SearchBox.Text = ""
+    end
+end)
+
+SearchBox.FocusLost:Connect(function()
+    if SearchBox.Text == "" then
+        SearchBox.Text = "Search..."
+    end
+end)
+
+-- Переменные для функций
+local noClip, fly, invisible, espEnabled, itemEsp, speedHack, infJump, killAura, godMode, autoFarm, autoRespawn, aimbot, clickTP, nuke, autoClicker, fovChanger, invisibleWalls, playerTracker = false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+local autoLoot, infAmmo, antiAim, wallHack, silentAim, headshotAim, bodyAim, teamESP, enemyESP, fastAttack, oneHitKill, antiBan, instantRespawn, unlockZoom, dayNightToggle, spinCharacter, rainbowCharacter, autoSteal, autoLockBase, infiniteCash, autoHeal, espTracers, superJump, invisibleCamera, autoInteract, speedBoost = false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+
+-- NoClip
+local function toggleNoClip()
+    noClip = not noClip
+    if noClip then
+        RunService:BindToRenderStep("NoClip", Enum.RenderPriority.Character.Value, function()
+            if LocalPlayer.Character then
+                for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+        showNotification("NoClip: ON")
+        print("NoClip enabled")
+    else
+        RunService:UnbindFromRenderStep("NoClip")
+        showNotification("NoClip: OFF")
+        print("NoClip disabled")
+    end
+end
+
+-- Fly
+local function toggleFly()
+    fly = not fly
+    if fly then
+        if LocalPlayer.Character and LocalPlayer.Character.HumanoidRootPart then
+            local bodyVelocity = Instance.new("BodyVelocity")
+            bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+            bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+            bodyVelocity.Parent = LocalPlayer.Character.HumanoidRootPart
+            RunService:BindToRenderStep("Fly", Enum.RenderPriority.Input.Value, function()
+                if LocalPlayer.Character then
+                    local moveDirection = Vector3.new(0, 0, 0)
+                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+                        moveDirection = moveDirection + Camera.CFrame.LookVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                        moveDirection = moveDirection - Camera.CFrame.LookVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+                        moveDirection = moveDirection - Camera.CFrame.RightVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+                        moveDirection = moveDirection + Camera.CFrame.RightVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+                        moveDirection = moveDirection + Vector3.new(0, 1, 0)
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+                        moveDirection = moveDirection - Vector3.new(0, 1, 0)
+                    end
+                    bodyVelocity.Velocity = moveDirection * config.flySpeed
+                end
+            end)
+            showNotification("Fly: ON")
+            print("Fly enabled")
+        else
+            showNotification("Fly: Character not found")
+            print("Fly failed: Character not found")
+        end
+    else
+        if LocalPlayer.Character and LocalPlayer.Character.HumanoidRootPart:FindFirstChild("BodyVelocity") then
+            LocalPlayer.Character.HumanoidRootPart.BodyVelocity:Destroy()
+        end
+        RunService:UnbindFromRenderStep("Fly")
+        showNotification("Fly: OFF")
+        print("Fly disabled")
+    end
+end
+
+-- Fly Settings
+local function openFlySettings()
+    local flySettingsFrame = Instance.new("Frame")
+    flySettingsFrame.Size = UDim2.new(0, 300, 0, 200)
+    flySettingsFrame.Position = UDim2.new(0.5, 160, 0.5, -300)
+    flySettingsFrame.BackgroundColor3 = themes[config.theme].Bg
+    flySettingsFrame.BackgroundTransparency = 0.1
+    flySettingsFrame.ZIndex = 600
+    flySettingsFrame.Parent = ScreenGui
+    local UICornerFly = Instance.new("UICorner")
+    UICornerFly.CornerRadius = UDim.new(0, 10)
+    UICornerFly.Parent = flySettingsFrame
+    local flyTitle = Instance.new("TextLabel")
+    flyTitle.Size = UDim2.new(1, 0, 0, 30)
+    flyTitle.BackgroundTransparency = 1
+    flyTitle.Text = "Fly Settings"
+    flyTitle.TextColor3 = themes[config.theme].Text
+    flyTitle.TextSize = 18
+    flyTitle.Font = Enum.Font.GothamBold
+    flyTitle.ZIndex = 601
+    flyTitle.Parent = flySettingsFrame
+    local setFly200 = createButton("Set FlySpeed to 200", 40, function()
+        config.flySpeed = 200
+        if fly and LocalPlayer.Character and LocalPlayer.Character.HumanoidRootPart:FindFirstChild("BodyVelocity") then
+            LocalPlayer.Character.HumanoidRootPart.BodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        end
+        if not fly then toggleFly() end
+        saveConfig()
+        showNotification("Fly Speed set to 200")
+        print("Fly Speed set to 200")
+    end)
+    setFly200.Parent = flySettingsFrame
+    local setFly400 = createButton("Set FlySpeed to 400", 80, function()
+        config.flySpeed = 400
+        if fly and LocalPlayer.Character and LocalPlayer.Character.HumanoidRootPart:FindFirstChild("BodyVelocity") then
+            LocalPlayer.Character.HumanoidRootPart.BodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        end
+        if not fly then toggleFly() end
+        saveConfig()
+        showNotification("Fly Speed set to 400")
+        print("Fly Speed set to 400")
+    end)
+    setFly400.Parent = flySettingsFrame
+    local setFly600 = createButton("Set FlySpeed to 600", 120, function()
+        config.flySpeed = 600
+        if fly and LocalPlayer.Character and LocalPlayer.Character.HumanoidRootPart:FindFirstChild("BodyVelocity") then
+            LocalPlayer.Character.HumanoidRootPart.BodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        end
+        if not fly then toggleFly() end
+        saveConfig()
+        showNotification("Fly Speed set to 600")
+        print("Fly Speed set to 600")
+    end)
+    setFly600.Parent = flySettingsFrame
+    local setFly1000 = createButton("Set FlySpeed to 1000", 160, function()
+        config.flySpeed = 1000
+        if fly and LocalPlayer.Character and LocalPlayer.Character.HumanoidRootPart:FindFirstChild("BodyVelocity") then
+            LocalPlayer.Character.HumanoidRootPart.BodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        end
+        if not fly then toggleFly() end
+        saveConfig()
+        showNotification("Fly Speed set to 1000")
+        print("Fly Speed set to 1000")
+    end)
+    setFly1000.Parent = flySettingsFrame
+    local closeButton = createButton("Close", 200, function()
+        flySettingsFrame:Destroy()
+        showNotification("Fly Settings closed")
+        print("Fly Settings closed")
+    end)
+    closeButton.Parent = flySettingsFrame
+    print("Fly Settings Frame created")
+end
+
+-- Invisibility
+local function toggleInvisibility()
+    invisible = not invisible
+    if invisible then
+        if LocalPlayer.Character then
+            for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                if part:IsA("BasePart") or part:IsA("Decal") then
+                    part.Transparency = 1
+                end
+            end
+            LocalPlayer.Character.HumanoidRootPart.Transparency = 0
+            showNotification("Invisibility: ON")
+            print("Invisibility enabled")
+        else
+            showNotification("Invisibility: Character not found")
+            print("Invisibility failed: Character not found")
+        end
+    else
+        if LocalPlayer.Character then
+            for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                if part:IsA("BasePart") or part:IsA("Decal") then
+                    part.Transparency = 0
+                end
+            end
+            showNotification("Invisibility: OFF")
+            print("Invisibility disabled")
+        end
+    end
+end
+
+-- ESP (Players)
+local function toggleESP()
+    espEnabled = not espEnabled
+    if espEnabled then
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                local highlight = Instance.new("Highlight")
+                highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                highlight.OutlineColor = themes[config.theme].Accent
+                highlight.Parent = player.Character
+            end
+        end
+        Players.PlayerAdded:Connect(function(player)
+            player.CharacterAdded:Connect(function(character)
+                if espEnabled then
+                    local highlight = Instance.new("Highlight")
+                    highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                    highlight.OutlineColor = themes[config.theme].Accent
+                    highlight.Parent = character
+                end
+            end)
+        end)
+        showNotification("Player ESP: ON")
+        print("Player ESP enabled")
+    else
+        for _, player in pairs(Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChildOfClass("Highlight") then
+                player.Character.Highlight:Destroy()
+            end
+        end
+        showNotification("Player ESP: OFF")
+        print("Player ESP disabled")
+    end
+end
+
+-- Team ESP
+local function toggleTeamESP()
+    config.teamESP = not config.teamESP
+    if config.teamESP then
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character and player.Team == LocalPlayer.Team then
+                local highlight = Instance.new("Highlight")
+                highlight.FillColor = Color3.fromRGB(0, 255, 0)
+                highlight.OutlineColor = themes[config.theme].Accent
+                highlight.Parent = player.Character
+            end
+        end
+        Players.PlayerAdded:Connect(function(player)
+            player.CharacterAdded:Connect(function(character)
+                if config.teamESP and player.Team == LocalPlayer.Team then
+                    local highlight = Instance.new("Highlight")
+                    highlight.FillColor = Color3.fromRGB(0, 255, 0)
+                    highlight.OutlineColor = themes[config.theme].Accent
+                    highlight.Parent = character
+                end
+            end)
+        end)
+        showNotification("Team ESP: ON")
+        print("Team ESP enabled")
+    else
+        for _, player in pairs(Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChildOfClass("Highlight") and player.Team == LocalPlayer.Team then
+                player.Character.Highlight:Destroy()
+            end
+        end
+        showNotification("Team ESP: OFF")
+        print("Team ESP disabled")
+    end
+    saveConfig()
+end
+
+-- Enemy ESP
+local function toggleEnemyESP()
+    config.enemyESP = not config.enemyESP
+    if config.enemyESP then
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character and player.Team ~= LocalPlayer.Team then
+                local highlight = Instance.new("Highlight")
+                highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                highlight.OutlineColor = themes[config.theme].Accent
+                highlight.Parent = player.Character
+            end
+        end
+        Players.PlayerAdded:Connect(function(player)
+            player.CharacterAdded:Connect(function(character)
+                if config.enemyESP and player.Team ~= LocalPlayer.Team then
+                    local highlight = Instance.new("Highlight")
+                    highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                    highlight.OutlineColor = themes[config.theme].Accent
+                    highlight.Parent = character
+                end
+            end)
+        end)
+        showNotification("Enemy ESP: ON")
+        print("Enemy ESP enabled")
+    else
+        for _, player in pairs(Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChildOfClass("Highlight") and player.Team ~= LocalPlayer.Team then
+                player.Character.Highlight:Destroy()
+            end
+        end
+        showNotification("Enemy ESP: OFF")
+        print("Enemy ESP disabled")
+    end
+    saveConfig()
+end
+
+-- Item ESP
+local function toggleItemESP()
+    config.itemESP = not config.itemESP
+    if config.itemESP then
+        for _, obj in pairs(game:GetService("Workspace"):GetDescendants()) do
+            if obj:IsA("BasePart") and (obj.Name:match("Resource") or obj.Name:match("Item") or obj.Name:match("BrainCash")) then
+                local highlight = Instance.new("Highlight")
+                highlight.FillColor = Color3.fromRGB(0, 255, 0)
+                highlight.OutlineColor = themes[config.theme].Accent
+                highlight.Parent = obj
+            end
+        end
+        showNotification("Item ESP: ON")
+        print("Item ESP enabled")
+    else
+        for _, obj in pairs(game:GetService("Workspace"):GetDescendants()) do
+            if obj:FindFirstChildOfClass("Highlight") then
+                obj.Highlight:Destroy()
+            end
+        end
+        showNotification("Item ESP: OFF")
+        print("Item ESP disabled")
+    end
+    saveConfig()
+end
+
+-- SpeedHack
+local function toggleSpeedHack()
+    speedHack = not speedHack
+    if speedHack then
+        if LocalPlayer.Character then
+            LocalPlayer.Character.Humanoid.WalkSpeed = config.walkSpeed
+            showNotification("SpeedHack: ON")
+            print("SpeedHack enabled")
+        else
+            showNotification("SpeedHack: Character not found")
+            print("SpeedHack failed: Character not found")
+        end
+    else
+        if LocalPlayer.Character then
+            LocalPlayer.Character.Humanoid.WalkSpeed = 16
+            showNotification("SpeedHack: OFF")
+            print("SpeedHack disabled")
+        end
+    end
+end
+
+-- SpeedHack Settings
+local function openSpeedHackSettings()
+    local speedSettingsFrame = Instance.new("Frame")
+    speedSettingsFrame.Size = UDim2.new(0, 300, 0, 200)
+    speedSettingsFrame.Position = UDim2.new(0.5, 160, 0.5, -150)
+    speedSettingsFrame.BackgroundColor3 = themes[config.theme].Bg
+    speedSettingsFrame.BackgroundTransparency = 0.1
+    speedSettingsFrame.ZIndex = 600
+    speedSettingsFrame.Parent = ScreenGui
+    local UICornerSpeed = Instance.new("UICorner")
+    UICornerSpeed.CornerRadius = UDim.new(0, 10)
+    UICornerSpeed.Parent = speedSettingsFrame
+    local speedTitle = Instance.new("TextLabel")
+    speedTitle.Size = UDim2.new(1, 0, 0, 30)
+    speedTitle.BackgroundTransparency = 1
+    speedTitle.Text = "SpeedHack Settings"
+    speedTitle.TextColor3 = themes[config.theme].Text
+    speedTitle.TextSize = 18
+    speedTitle.Font = Enum.Font.GothamBold
+    speedTitle.ZIndex = 601
+    speedTitle.Parent = speedSettingsFrame
+    local setSpeed200 = createButton("Set WalkSpeed to 200", 40, function()
+        config.walkSpeed = 200
+        if speedHack and LocalPlayer.Character then
+            LocalPlayer.Character.Humanoid.WalkSpeed = config.walkSpeed
+        end
+        if not speedHack then toggleSpeedHack() end
+        saveConfig()
+        showNotification("Walk Speed set to 200")
+        print("Walk Speed set to 200")
+    end)
+    setSpeed200.Parent = speedSettingsFrame
+    local setSpeed600 = createButton("Set WalkSpeed to 600", 80, function()
+        config.walkSpeed = 600
+        if speedHack and LocalPlayer.Character then
+            LocalPlayer.Character.Humanoid.WalkSpeed = config.walkSpeed
+        end
+        if not speedHack then toggleSpeedHack() end
+        saveConfig()
+        showNotification("Walk Speed set to 600")
+        print("Walk Speed set to 600")
+    end)
+    setSpeed600.Parent = speedSettingsFrame
+    local setSpeed800 = createButton("Set WalkSpeed to 800", 120, function()
+        config.walkSpeed = 800
+        if speedHack and LocalPlayer.Character then
+            LocalPlayer.Character.Humanoid.WalkSpeed = config.walkSpeed
+        end
+        if not speedHack then toggleSpeedHack() end
+        saveConfig()
+        showNotification("Walk Speed set to 800")
+        print("Walk Speed set to 800")
+    end)
+    setSpeed800.Parent = speedSettingsFrame
+    local setSpeed1200 = createButton("Set WalkSpeed to 1200", 160, function()
+        config.walkSpeed = 1200
+        if speedHack and LocalPlayer.Character then
+            LocalPlayer.Character.Humanoid.WalkSpeed = config.walkSpeed
+        end
+        if not speedHack then toggleSpeedHack() end
+        saveConfig()
+        showNotification("Walk Speed set to 1200")
+        print("Walk Speed set to 1200")
+    end)
+    setSpeed1200.Parent = speedSettingsFrame
+    local closeButton = createButton("Close", 200, function()
+        speedSettingsFrame:Destroy()
+        showNotification("SpeedHack Settings closed")
+        print("SpeedHack Settings closed")
+    end)
+    closeButton.Parent = speedSettingsFrame
+    print("SpeedHack Settings Frame created")
+end
+
+-- Infinite Jump
+local function toggleInfJump()
+    infJump = not infJump
+    if infJump then
+        UserInputService.JumpRequest:Connect(function()
+            if LocalPlayer.Character then
+                LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end)
+        showNotification("Infinite Jump: ON")
+        print("Infinite Jump enabled")
+    else
+        showNotification("Infinite Jump: OFF")
+        print("Infinite Jump disabled")
+    end
+end
+
+-- Super Jump
+local function toggleSuperJump()
+    superJump = not superJump
+    if superJump then
+        if LocalPlayer.Character then
+            LocalPlayer.Character.Humanoid.JumpPower = config.superJumpPower
+            showNotification("Super Jump: ON")
+            print("Super Jump enabled")
+        else
+            showNotification("Super Jump: Character not found")
+            print("Super Jump failed: Character not found")
+        end
+    else
+        if LocalPlayer.Character then
+            LocalPlayer.Character.Humanoid.JumpPower = 50
+            showNotification("Super Jump: OFF")
+            print("Super Jump disabled")
+        end
+    end
+end
+
+-- Kill Aura
+local function toggleKillAura()
+    killAura = not killAura
+    if killAura then
+        RunService:BindToRenderStep("KillAura", Enum.RenderPriority.Character.Value, function()
+            if LocalPlayer.Character then
+                for _, player in pairs(Players:GetPlayers()) do
+                    if player ~= LocalPlayer and player.Character and player.Character.Humanoid and player.Character.Humanoid.Health > 0 then
+                        local distance = (LocalPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+                        if distance <= config.auraRange then
+                            pcall(function()
+                                game:GetService("ReplicatedStorage").Damage:FireServer(player.Character.Humanoid, 100 * config.damageMultiplier)
+                            end)
+                        end
+                    end
+                end
+            end
+        end)
+        showNotification("Kill Aura: ON")
+        print("Kill Aura enabled")
+    else
+        RunService:UnbindFromRenderStep("KillAura")
+        showNotification("Kill Aura: OFF")
+        print("Kill Aura disabled")
+    end
+end
+
+-- God Mode
+local function toggleGodMode()
+    godMode = not godMode
+    if godMode then
+        if LocalPlayer.Character then
+            LocalPlayer.Character.Humanoid.MaxHealth = math.huge
+            LocalPlayer.Character.Humanoid.Health = math.huge
+            showNotification("God Mode: ON")
+            print("God Mode enabled")
+        else
+            showNotification("God Mode: Character not found")
+            print("God Mode failed: Character not found")
+        end
+    else
+        if LocalPlayer.Character then
+            LocalPlayer.Character.Humanoid.MaxHealth = 100
+            LocalPlayer.Character.Humanoid.Health = 100
+            showNotification("God Mode: OFF")
+            print("God Mode disabled")
+        end
+    end
+end
+
+-- AutoFarm
+local function toggleAutoFarm()
+    config.autoFarm = not config.autoFarm
+    if config.autoFarm then
+        RunService:BindToRenderStep("AutoFarm", Enum.RenderPriority.Character.Value, function()
+            if LocalPlayer.Character then
+                for _, obj in pairs(game:GetService("Workspace"):GetChildren()) do
+                    if obj:IsA("BasePart") and (obj.Name:match("Resource") or obj.Name:match("BrainCash")) then
+                        LocalPlayer.Character.HumanoidRootPart.CFrame = obj.CFrame
+                        wait(0.1)
+                        pcall(function()
+                            game:GetService("ReplicatedStorage").Interact:FireServer(obj)
+                        end)
+                    end
+                end
+            end
+        end)
+        showNotification("AutoFarm: ON")
+        print("AutoFarm enabled")
+    else
+        RunService:UnbindFromRenderStep("AutoFarm")
+        showNotification("AutoFarm: OFF")
+        print("AutoFarm disabled")
+    end
+    saveConfig()
+end
+
+-- Auto Loot (BrainCash)
+local function toggleAutoLoot()
+    config.autoLoot = not config.autoLoot
+    if config.autoLoot then
+        RunService:BindToRenderStep("AutoLoot", Enum.RenderPriority.Character.Value, function()
+            if LocalPlayer.Character then
+                for _, obj in pairs(game:GetService("Workspace"):GetChildren()) do
+                    if obj:IsA("BasePart") and obj.Name:match("BrainCash") then
+                        LocalPlayer.Character.HumanoidRootPart.CFrame = obj.CFrame
+                        wait(0.05)
+                        pcall(function()
+                            game:GetService("ReplicatedStorage").Interact:FireServer(obj)
+                        end)
+                    end
+                end
+            end
+        end)
+        showNotification("Auto Loot: ON")
+        print("Auto Loot enabled")
+    else
+        RunService:UnbindFromRenderStep("AutoLoot")
+        showNotification("Auto Loot: OFF")
+        print("Auto Loot disabled")
+    end
+    saveConfig()
+end
+
+-- Auto Steal
+local function toggleAutoSteal()
+    config.autoSteal = not config.autoSteal
+    if config.autoSteal then
+        RunService:BindToRenderStep("AutoSteal", Enum.RenderPriority.Character.Value, function()
+            if LocalPlayer.Character then
+                pcall(function()
+                    game:GetService("ReplicatedStorage").Packages.Net["RE/StealService/DeliverySteal"]:FireServer()
+                end)
+                wait(2.5)
+            end
+        end)
+        showNotification("Auto Steal: ON")
+        print("Auto Steal enabled")
+    else
+        RunService:UnbindFromRenderStep("AutoSteal")
+        showNotification("Auto Steal: OFF")
+        print("Auto Steal disabled")
+    end
+    saveConfig()
+end
+
+-- Auto Lock Base
+local function toggleAutoLockBase()
+    config.autoLockBase = not config.autoLockBase
+    if config.autoLockBase then
+        RunService:BindToRenderStep("AutoLockBase", Enum.RenderPriority.Character.Value, function()
+            if LocalPlayer.Character then
+                pcall(function()
+                    game:GetService("ReplicatedStorage").LockBase:FireServer(true)
+                end)
+            end
+        end)
+        showNotification("Auto Lock Base: ON")
+        print("Auto Lock Base enabled")
+    else
+        RunService:UnbindFromRenderStep("AutoLockBase")
+        showNotification("Auto Lock Base: OFF")
+        print("Auto Lock Base disabled")
+    end
+    saveConfig()
+end
+
+-- Infinite Cash
+local function toggleInfiniteCash()
+    config.infiniteCash = not config.infiniteCash
+    if config.infiniteCash then
+        RunService:BindToRenderStep("InfiniteCash", Enum.RenderPriority.Character.Value, function()
+            if LocalPlayer.Character then
+                pcall(function()
+                    game:GetService("ReplicatedStorage").AddCurrency:FireServer("BrainCash", 1000000)
+                end)
+            end
+        end)
+        showNotification("Infinite Cash: ON")
+        print("Infinite Cash enabled")
+    else
+        RunService:UnbindFromRenderStep("InfiniteCash")
+        showNotification("Infinite Cash: OFF")
+        print("Infinite Cash disabled")
+    end
+    saveConfig()
+end
+
+-- Anti-Kick
+local function toggleAntiKick()
+    config.antiKick = not config.antiKick
+    if config.antiKick then
+        RunService:BindToRenderStep("AntiKick", Enum.RenderPriority.Character.Value, function()
+            pcall(function()
+                game:GetService("ReplicatedStorage").AntiCheat:FireServer(false)
+            end)
+        end)
+        showNotification("Anti-Kick: ON")
+        print("Anti-Kick enabled")
+    else
+        RunService:UnbindFromRenderStep("AntiKick")
+        showNotification("Anti-Kick: OFF")
+        print("Anti-Kick disabled")
+    end
+    saveConfig()
+end
+
+-- Auto Respawn
+local function toggleAutoRespawn()
+    config.autoRespawn = not config.autoRespawn
+    if config.autoRespawn then
+        RunService:BindToRenderStep("AutoRespawn", Enum.RenderPriority.Character.Value, function()
+            if LocalPlayer.Character and LocalPlayer.Character.Humanoid.Health <= 0 then
+                pcall(function()
+                    game:GetService("ReplicatedStorage").Respawn:FireServer()
+                end)
+            end
+        end)
+        showNotification("Auto Respawn: ON")
+        print("Auto Respawn enabled")
+    else
+        RunService:UnbindFromRenderStep("AutoRespawn")
+        showNotification("Auto Respawn: OFF")
+        print("Auto Respawn disabled")
+    end
+    saveConfig()
+end
+
+-- Instant Respawn
+local function toggleInstantRespawn()
+    config.instantRespawn = not config.instantRespawn
+    if config.instantRespawn then
+        RunService:BindToRenderStep("InstantRespawn", Enum.RenderPriority.Character.Value, function()
+            if LocalPlayer.Character and LocalPlayer.Character.Humanoid.Health <= 0 then
+                pcall(function()
+                    game:GetService("ReplicatedStorage").Respawn:FireServer()
+                    wait(0.1)
+                    LocalPlayer.Character.Humanoid.WalkSpeed = config.walkSpeed
+                end)
+            end
+        end)
+        showNotification("Instant Respawn: ON")
+        print("Instant Respawn enabled")
+    else
+        RunService:UnbindFromRenderStep("InstantRespawn")
+        showNotification("Instant Respawn: OFF")
+        print("Instant Respawn disabled")
+    end
+    saveConfig()
+end
+
+-- Auto Heal
+local function toggleAutoHeal()
+    config.autoHeal = not config.autoHeal
+    if config.autoHeal then
+        RunService:BindToRenderStep("AutoHeal", Enum.RenderPriority.Character.Value, function()
+            if LocalPlayer.Character and LocalPlayer.Character.Humanoid then
+                LocalPlayer.Character.Humanoid.Health = LocalPlayer.Character.Humanoid.MaxHealth
+            end
+        end)
+        showNotification("Auto Heal: ON")
+        print("Auto Heal enabled")
+    else
+        RunService:UnbindFromRenderStep("AutoHeal")
+        showNotification("Auto Heal: OFF")
+        print("Auto Heal disabled")
+    end
+    saveConfig()
+end
+
+-- Teleport to Safe Zone
+local function teleportToSafeZone()
+    if LocalPlayer.Character and LocalPlayer.Character.HumanoidRootPart then
+        local safeZone = game:GetService("Workspace"):FindFirstChild("SafeZone") or game:GetService("Workspace"):FindFirstChild("SpawnLocation")
+        if safeZone then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = safeZone.CFrame + Vector3.new(0, 3, 0)
+            showNotification("Teleported to Safe Zone")
+            print("Teleported to Safe Zone")
+        else
+            showNotification("Safe Zone not found")
+            print("Safe Zone not found")
+        end
+    else
+        showNotification("Character not found")
+        print("Character not found")
+    end
+end
+
+-- ESP Tracers
+local function toggleESPTracers()
+    config.espTracers = not config.espTracers
+    if config.espTracers then
+        local tracerGui = Instance.new("ScreenGui")
+        tracerGui.Name = "ESPTracers"
+        tracerGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+        tracerGui.Parent = LocalPlayer.PlayerGui
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                local line = Instance.new("LineHandleAdornment")
+                line.Color3 = Color3.fromRGB(255, 0, 0)
+                line.Thickness = 2
+                line.Adornee = player.Character.HumanoidRootPart
+                line.Parent = tracerGui
+                RunService.RenderStepped:Connect(function()
+                    if player.Character and player.Character.HumanoidRootPart and LocalPlayer.Character then
+                        local startPos = Camera:WorldToViewportPoint(LocalPlayer.Character.HumanoidRootPart.Position)
+                        local endPos = Camera:WorldToViewportPoint(player.Character.HumanoidRootPart.Position)
+                        if startPos.Z > 0 and endPos.Z > 0 then
+                            line.Visible = true
+                            line.From = Vector3.new(startPos.X, startPos.Y, 0)
+                            line.To = Vector3.new(endPos.X, endPos.Y, 0)
+                        else
+                            line.Visible = false
+                        end
+                    end
+                end)
+            end
+        end
+        Players.PlayerAdded:Connect(function(player)
+            player.CharacterAdded:Connect(function(character)
+                if config.espTracers then
+                    local line = Instance.new("LineHandleAdornment")
+                    line.Color3 = Color3.fromRGB(255, 0, 0)
+                    line.Thickness = 2
+                    line.Adornee = character.HumanoidRootPart
+                    line.Parent = tracerGui
+                    RunService.RenderStepped:Connect(function()
+                        if player.Character and player.Character.HumanoidRootPart and LocalPlayer.Character then
+                            local startPos = Camera:WorldToViewportPoint(LocalPlayer.Character.HumanoidRootPart.Position)
+                            local endPos = Camera:WorldToViewportPoint(player.Character.HumanoidRootPart.Position)
+                            if startPos.Z > 0 and endPos.Z > 0 then
+                                line.Visible = true
+                                line.From = Vector3.new(startPos.X, startPos.Y, 0)
+                                line.To = Vector3.new(endPos.X, endPos.Y, 0)
+                            else
+                                line.Visible = false
+                            end
+                        end
+                    end)
+                end
+            end)
+        end)
+        showNotification("ESP Tracers: ON")
+        print("ESP Tracers enabled")
+    else
+        if LocalPlayer.PlayerGui:FindFirstChild("ESPTracers") then
+            LocalPlayer.PlayerGui.ESPTracers:Destroy()
+        end
+        showNotification("ESP Tracers: OFF")
+        print("ESP Tracers disabled")
+    end
+    saveConfig()
+end
+
+-- Invisible Camera
+local function toggleInvisibleCamera()
+    config.invisibleCamera = not config.invisibleCamera
+    if config.invisibleCamera then
+        pcall(function()
+            Camera.CameraType = Enum.CameraType.Scriptable
+            showNotification("Invisible Camera: ON")
+            print("Invisible Camera enabled")
+        end)
+    else
+        pcall(function()
+            Camera.CameraType = Enum.CameraType.Custom
+            showNotification("Invisible Camera: OFF")
+            print("Invisible Camera disabled")
+        end)
+    end
+    saveConfig()
+end
+
+-- Auto Interact
+local function toggleAutoInteract()
+    config.autoInteract = not config.autoInteract
+    if config.autoInteract then
+        RunService:BindToRenderStep("AutoInteract", Enum.RenderPriority.Character.Value, function()
+            if LocalPlayer.Character then
+                for _, obj in pairs(game:GetService("Workspace"):GetChildren()) do
+                    if obj:IsA("BasePart") and (obj.Name:match("Interact") or obj.Name:match("Button") or obj.Name:match("Trigger")) then
+                        local distance = (LocalPlayer.Character.HumanoidRootPart.Position - obj.Position).Magnitude
+                        if distance <= 10 then
+                            pcall(function()
+                                game:GetService("ReplicatedStorage").Interact:FireServer(obj)
+                            end)
+                        end
+                    end
+                end
+            end
+        end)
+        showNotification("Auto Interact: ON")
+        print("Auto Interact enabled")
+    else
+        RunService:UnbindFromRenderStep("AutoInteract")
+        showNotification("Auto Interact: OFF")
+        print("Auto Interact disabled")
+    end
+    saveConfig()
+end
+
+-- Speed Boost
+local function toggleSpeedBoost()
+    config.speedBoost = not config.speedBoost
+    if config.speedBoost then
+        UserInputService.InputBegan:Connect(function(input)
+            if input.KeyCode == config.hotkeys.SpeedBoost and LocalPlayer.Character then
+                LocalPlayer.Character.Humanoid.WalkSpeed = config.walkSpeed * config.speedBoostMultiplier
+                showNotification("Speed Boost: Activated")
+                print("Speed Boost activated")
+            end
+        end)
+        UserInputService.InputEnded:Connect(function(input)
+            if input.KeyCode == config.hotkeys.SpeedBoost and LocalPlayer.Character then
+                LocalPlayer.Character.Humanoid.WalkSpeed = speedHack and config.walkSpeed or 16
+                showNotification("Speed Boost: Deactivated")
+                print("Speed Boost deactivated")
+            end
+        end)
+        showNotification("Speed Boost: ON")
+        print("Speed Boost enabled")
+    else
+        showNotification("Speed Boost: OFF")
+        print("Speed Boost disabled")
+    end
+    saveConfig()
+end
+
+-- Aimbot
+local function toggleAimbot()
+    aimbot = not aimbot
+    if aimbot then
+        RunService:BindToRenderStep("Aimbot", Enum.RenderPriority.Camera.Value, function()
+            local closestPlayer = nil
+            local closestDistance = math.huge
+            local mousePos = UserInputService:GetMouseLocation()
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer and player.Character and player.Character.Humanoid and player.Character.Humanoid.Health > 0 then
+                    local head = player.Character:FindFirstChild("Head")
+                    if head then
+                        local screenPos, onScreen = Camera:WorldToViewportPoint(head.Position)
+                        if onScreen then
+                            local distance = (Vector2.new(mousePos.X, mousePos.Y) - Vector2.new(screenPos.X, screenPos.Y)).Magnitude
+                            if distance < closestDistance then
+                                closestDistance = distance
+                                closestPlayer = player
+                            end
+                        end
+                    end
+                end
+            end
+            if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("Head") then
+                local targetPos = Camera:WorldToViewportPoint(closestPlayer.Character.Head.Position)
+                local currentPos = UserInputService:GetMouseLocation()
+                local newPos = currentPos + (Vector2.new(targetPos.X, targetPos.Y) - currentPos) * config.aimbotSmoothness
+                pcall(function()
+                    mousemoverel((newPos.X - currentPos.X), (newPos.Y - currentPos.Y))
+                end)
+            end
+        end)
+        showNotification("Aimbot: ON")
+        print("Aimbot enabled")
+    else
+        RunService:UnbindFromRenderStep("Aimbot")
+        showNotification("Aimbot: OFF")
+        print("Aimbot disabled")
+    end
+end
+
+-- Silent Aimbot
+local function toggleSilentAim()
+    config.silentAim = not config.silentAim
+    if config.silentAim then
+        RunService:BindToRenderStep("SilentAim", Enum.RenderPriority.Camera.Value, function()
+            local closestPlayer = nil
+            local closestDistance = math.huge
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer and player.Character and player.Character.Humanoid and player.Character.Humanoid.Health > 0 then
+                    local head = player.Character:FindFirstChild("Head")
+                    if head then
+                        local screenPos, onScreen = Camera:WorldToViewportPoint(head.Position)
+                        if onScreen then
+                            local distance = (Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2) - Vector2.new(screenPos.X, screenPos.Y)).Magnitude
+                            if distance < closestDistance then
+                                closestDistance = distance
+                                closestPlayer = player
+                            end
+                        end
+                    end
+                end
+            end
+            if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("Head") then
+                pcall(function()
+                    game:GetService("ReplicatedStorage").Fire:FireServer(closestPlayer.Character.Head.Position)
+                end)
+            end
+        end)
+        showNotification("Silent Aimbot: ON")
+        print("Silent Aimbot enabled")
+    else
+        RunService:UnbindFromRenderStep("SilentAim")
+        showNotification("Silent Aimbot: OFF")
+        print("Silent Aimbot disabled")
+    end
+    saveConfig()
+end
+
+-- Headshot Only Aimbot
+local function toggleHeadshotAim()
+    config.headshotAim = not config.headshotAim
+    if config.headshotAim then
+        RunService:BindToRenderStep("HeadshotAim", Enum.RenderPriority.Camera.Value, function()
+            local closestPlayer = nil
+            local closestDistance = math.huge
+            local mousePos = UserInputService:GetMouseLocation()
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer and player.Character and player.Character.Humanoid and player.Character.Humanoid.Health > 0 then
+                    local head = player.Character:FindFirstChild("Head")
+                    if head then
+                        local screenPos, onScreen = Camera:WorldToViewportPoint(head.Position)
+                        if onScreen then
+                            local distance = (Vector2.new(mousePos.X, mousePos.Y) - Vector2.new(screenPos.X, screenPos.Y)).Magnitude
+                            if distance < closestDistance then
+                                closestDistance = distance
+                                closestPlayer = player
+                            end
+                        end
+                    end
+                end
+            end
+            if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("Head") then
+                local targetPos = Camera:WorldToViewportPoint(closestPlayer.Character.Head.Position)
+                local currentPos = UserInputService:GetMouseLocation()
+                local newPos = currentPos + (Vector2.new(targetPos.X, targetPos.Y) - currentPos) * config.aimbotSmoothness
+                pcall(function()
+                    mousemoverel((newPos.X - currentPos.X), (newPos.Y - currentPos.Y))
+                    game:GetService("ReplicatedStorage").Fire:FireServer(closestPlayer.Character.Head.Position)
+                end)
+            end
+        end)
+        showNotification("Headshot Aimbot: ON")
+        print("Headshot Aimbot enabled")
+    else
+        RunService:UnbindFromRenderStep("HeadshotAim")
+        showNotification("Headshot Aimbot: OFF")
+        print("Headshot Aimbot disabled")
+    end
+    saveConfig()
+end
+
+-- Body Aimbot
+local function toggleBodyAim()
+    config.bodyAim = not config.bodyAim
+    if config.bodyAim then
+        RunService:BindToRenderStep("BodyAim", Enum.RenderPriority.Camera.Value, function()
+            local closestPlayer = nil
+            local closestDistance = math.huge
+            local mousePos = UserInputService:GetMouseLocation()
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer and player.Character and player.Character.Humanoid and player.Character.Humanoid.Health > 0 then
+                    local torso = player.Character:FindFirstChild("Torso") or player.Character:FindFirstChild("UpperTorso")
+                    if torso then
+                        local screenPos, onScreen = Camera:WorldToViewportPoint(torso.Position)
+                        if onScreen then
+                            local distance = (Vector2.new(mousePos.X, mousePos.Y) - Vector2.new(screenPos.X, screenPos.Y)).Magnitude
+                            if distance < closestDistance then
+                                closestDistance = distance
+                                closestPlayer = player
+                            end
+                        end
+                    end
+                end
+            end
+            if closestPlayer and closestPlayer.Character and (closestPlayer.Character:FindFirstChild("Torso") or closestPlayer.Character:FindFirstChild("UpperTorso")) then
+                local torso = closestPlayer.Character:FindFirstChild("Torso") or closestPlayer.Character:FindFirstChild("UpperTorso")
+                local targetPos = Camera:WorldToViewportPoint(torso.Position)
+                local currentPos = UserInputService:GetMouseLocation()
+                local newPos = currentPos + (Vector2.new(targetPos.X, targetPos.Y) - currentPos) * config.aimbotSmoothness
+                pcall(function()
+                    mousemoverel((newPos.X - currentPos.X), (newPos.Y - currentPos.Y))
+                    game:GetService("ReplicatedStorage").Fire:FireServer(torso.Position)
+                end)
+            end
+        end)
+        showNotification("Body Aimbot: ON")
+        print("Body Aimbot enabled")
+    else
+        RunService:UnbindFromRenderStep("BodyAim")
+        showNotification("Body Aimbot: OFF")
+        print("Body Aimbot disabled")
+    end
+    saveConfig()
+end
+
+-- Click TP
+local function toggleClickTP()
+    clickTP = not clickTP
+    if clickTP then
+        UserInputService.InputBegan:Connect(function(input)
+            if input.KeyCode == config.hotkeys.ClickTP and LocalPlayer.Character then
+                local mouse = UserInputService:GetMouseLocation()
+                local ray = Camera:ViewportPointToRay(mouse.X, mouse.Y)
+                local raycastParams = RaycastParams.new()
+                raycastParams.FilterDescendantsInstances = {LocalPlayer.Character}
+                raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+                local result = game:GetService("Workspace"):Raycast(ray.Origin, ray.Direction * 1000, raycastParams)
+                if result then
+                    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(result.Position + Vector3.new(0, 3, 0))
+                    showNotification("Click TP: Teleported")
+                    print("Click TP executed")
+                end
+            end
+        end)
+        showNotification("Click TP: ON")
+        print("Click TP enabled")
+    else
+        showNotification("Click TP: OFF")
+        print("Click TP disabled")
+    end
+end
+
+-- Auto Clicker
+local function toggleAutoClicker()
+    config.autoClicker = not config.autoClicker
+    if config.autoClicker then
+        RunService:BindToRenderStep("AutoClicker", Enum.RenderPriority.Input.Value, function()
+            if UserInputService:IsKeyDown(config.hotkeys.AutoClicker) then
+                pcall(function()
+                    mouse1click()
+                end)
+                wait(1 / config.clickTPSpeed)
+            end
+        end)
+        showNotification("Auto Clicker: ON")
+        print("Auto Clicker enabled")
+    else
+        RunService:UnbindFromRenderStep("AutoClicker")
+        showNotification("Auto Clicker: OFF")
+        print("Auto Clicker disabled")
+    end
+    saveConfig()
+end
+
+-- FOV Changer
+local function toggleFOVChanger()
+    fovChanger = not fovChanger
+    if fovChanger then
+        Camera.FieldOfView = config.fovValue
+        showNotification("FOV Changer: ON")
+        print("FOV Changer enabled")
+    else
+        Camera.FieldOfView = 70
+        showNotification("FOV Changer: OFF")
+        print("FOV Changer disabled")
+    end
+end
+
+-- FOV Settings
+local function openFOVSettings()
+    local fovSettingsFrame = Instance.new("Frame")
+    fovSettingsFrame.Size = UDim2.new(0, 300, 0, 150)
+    fovSettingsFrame.Position = UDim2.new(0.5, 160, 0.5, 0)
+    fovSettingsFrame.BackgroundColor3 = themes[config.theme].Bg
+    fovSettingsFrame.BackgroundTransparency = 0.1
+    fovSettingsFrame.ZIndex = 600
+    fovSettingsFrame.Parent = ScreenGui
+    local UICornerFOV = Instance.new("UICorner")
+    UICornerFOV.CornerRadius = UDim.new(0, 10)
+    UICornerFOV.Parent = fovSettingsFrame
+    local fovTitle = Instance.new("TextLabel")
+    fovTitle.Size = UDim2.new(1, 0, 0, 30)
+    fovTitle.BackgroundTransparency = 1
+    fovTitle.Text = "FOV Settings"
+    fovTitle.TextColor3 = themes[config.theme].Text
+    fovTitle.TextSize = 18
+    fovTitle.Font = Enum.Font.GothamBold
+    fovTitle.ZIndex = 601
+    fovTitle.Parent = fovSettingsFrame
+    local fovBox = createTextBox("FOV Value (30-120)", 40, tostring(config.fovValue), fovSettingsFrame)
+    fovBox.FocusLost:Connect(function()
+        local value = tonumber(fovBox.Text)
+        if value and value >= 30 and value <= 120 then
+            config.fovValue = value
+            if fovChanger then
+                Camera.FieldOfView = config.fovValue
+            end
+            saveConfig()
+            showNotification("FOV Value set to " .. config.fovValue)
+            print("FOV Value set to " .. config.fovValue)
+        else
+            showNotification("Invalid FOV Value (30-120)")
+            print("Invalid FOV Value")
+        end
+    end)
+    local applyButton = createButton("Apply", 80, function()
+        local value = tonumber(fovBox.Text)
+        if value and value >= 30 and value <= 120 then
+            config.fovValue = value
+            if fovChanger then
+                Camera.FieldOfView = config.fovValue
+            end
+            saveConfig()
+            showNotification("FOV Value set to " .. config.fovValue)
+            print("FOV Value set to " .. config.fovValue)
+        else
+            showNotification("Invalid FOV Value (30-120)")
+            print("Invalid FOV Value")
+        end
+    end)
+    applyButton.Parent = fovSettingsFrame
+    local closeButton = createButton("Close", 120, function()
+        fovSettingsFrame:Destroy()
+        showNotification("FOV Settings closed")
+        print("FOV Settings closed")
+    end)
+    closeButton.Parent = fovSettingsFrame
+    print("FOV Settings Frame created")
+end
+
+-- Invisible Walls
+local function toggleInvisibleWalls()
+    invisibleWalls = not invisibleWalls
+    for _, obj in pairs(game:GetService("Workspace"):GetDescendants()) do
+        if obj:IsA("BasePart") and obj.Name:match("Wall") then
+            obj.Transparency = invisibleWalls and 0.9 or 0
+            obj.CanCollide = not invisibleWalls
+        end
+    end
+    showNotification("Invisible Walls: " .. (invisibleWalls and "ON" or "OFF"))
+    print("Invisible Walls " .. (invisibleWalls and "enabled" or "disabled"))
+end
+
+-- WallHack
+local function toggleWallHack()
+    config.wallHack = not config.wallHack
+    if config.wallHack then
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                for _, part in pairs(player.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.Transparency = 0.5
+                    end
+                end
+            end
+        end
+        showNotification("WallHack: ON")
+        print("WallHack enabled")
+    else
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                for _, part in pairs(player.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.Transparency = 0
+                    end
+                end
+            end
+        end
+        showNotification("WallHack: OFF")
+        print("WallHack disabled")
+    end
+    saveConfig()
+end
+
+-- Player Tracker
+local function togglePlayerTracker()
+    playerTracker = not playerTracker
+    if playerTracker then
+        local trackerGui = Instance.new("ScreenGui")
+        trackerGui.Name = "PlayerTracker"
+        trackerGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+        trackerGui.Parent = LocalPlayer.PlayerGui
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                local label = Instance.new("TextLabel")
+                label.Size = UDim2.new(0, 100, 0, 20)
+                label.BackgroundTransparency = 1
+                label.TextColor3 = themes[config.theme].Text
+                label.Text = player.Name
+                label.ZIndex = 1000
+                label.Parent = trackerGui
+                RunService.RenderStepped:Connect(function()
+                    if player.Character and player.Character:FindFirstChild("Head") then
+                        local headPos, onScreen = Camera:WorldToViewportPoint(player.Character.Head.Position)
+                        if onScreen then
+                            label.Position = UDim2.new(0, headPos.X - 50, 0, headPos.Y - 20)
+                            label.Visible = true
+                        else
+                            label.Visible = false
+                        end
+                    end
+                end)
+            end
+        end
+        Players.PlayerAdded:Connect(function(player)
+            player.CharacterAdded:Connect(function(character)
+                if playerTracker then
+                    local label = Instance.new("TextLabel")
+                    label.Size = UDim2.new(0, 100, 0, 20)
+                    label.BackgroundTransparency = 1
+                    label.TextColor3 = themes[config.theme].Text
+                    label.Text = player.Name
+                    label.ZIndex = 1000
+                    label.Parent = trackerGui
+                    RunService.RenderStepped:Connect(function()
+                        if player.Character and player.Character:FindFirstChild("Head") then
+                            local headPos, onScreen = Camera:WorldToViewportPoint(player.Character.Head.Position)
+                            if onScreen then
+                                label.Position = UDim2.new(0, headPos.X - 50, 0, headPos.Y - 20)
+                                label.Visible = true
+                            else
+                                label.Visible = false
+                            end
+                        end
+                    end)
+                end
+            end)
+        end)
+        showNotification("Player Tracker: ON")
+        print("Player Tracker enabled")
+    else
+        if LocalPlayer.PlayerGui:FindFirstChild("PlayerTracker") then
+            LocalPlayer.PlayerGui.PlayerTracker:Destroy()
+        end
+        showNotification("Player Tracker: OFF")
+        print("Player Tracker disabled")
+    end
+end
+
+-- Custom Gravity
+local function toggleCustomGravity()
+    game:GetService("Workspace").Gravity = config.customGravity
+    showNotification("Custom Gravity: Set to " .. config.customGravity)
+    print("Custom Gravity set to " .. config.customGravity)
+end
+
+-- Nuke
+local function triggerNuke()
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character.Humanoid and player.Character.Humanoid.Health > 0 then
+            pcall(function()
+                game:GetService("ReplicatedStorage").Damage:FireServer(player.Character.Humanoid, 1000 * config.damageMultiplier)
+            end)
+        end
+    end
+    showNotification("Nuke: Executed")
+    print("Nuke executed")
+end
+
+-- Fast Attack
+local function toggleFastAttack()
+    config.fastAttack = not config.fastAttack
+    if config.fastAttack then
+        RunService:BindToRenderStep("FastAttack", Enum.RenderPriority.Input.Value, function()
+            if LocalPlayer.Character then
+                pcall(function()
+                    game:GetService("ReplicatedStorage").Attack:FireServer()
+                end)
+                wait(0.05)
+            end
+        end)
+        showNotification("Fast Attack: ON")
+        print("Fast Attack enabled")
+    else
+        RunService:UnbindFromRenderStep("FastAttack")
+        showNotification("Fast Attack: OFF")
+        print("Fast Attack disabled")
+    end
+    saveConfig()
+end
+
+-- One-Hit Kill
+local function toggleOneHitKill()
+    config.oneHitKill = not config.oneHitKill
+    if config.oneHitKill then
+        config.damageMultiplier = 1000
+        showNotification("One-Hit Kill: ON")
+        print("One-Hit Kill enabled")
+    else
+        config.damageMultiplier = 1
+        showNotification("One-Hit Kill: OFF")
+        print("One-Hit Kill disabled")
+    end
+    saveConfig()
+end
+
+-- Anti-Aim
+local function toggleAntiAim()
+    config.antiAim = not config.antiAim
+    if config.antiAim then
+        RunService:BindToRenderStep("AntiAim", Enum.RenderPriority.Character.Value, function()
+            if LocalPlayer.Character and LocalPlayer.Character.HumanoidRootPart then
+                LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(math.random(-180, 180)), 0)
+            end
+        end)
+        showNotification("Anti-Aim: ON")
+        print("Anti-Aim enabled")
+    else
+        RunService:UnbindFromRenderStep("AntiAim")
+        showNotification("Anti-Aim: OFF")
+        print("Anti-Aim disabled")
+    end
+    saveConfig()
+end
+
+-- Infinite Ammo
+local function toggleInfAmmo()
+    config.infAmmo = not config.infAmmo
+    if config.infAmmo then
+        RunService:BindToRenderStep("InfAmmo", Enum.RenderPriority.Character.Value, function()
+            if LocalPlayer.Character then
+                pcall(function()
+                    game:GetService("ReplicatedStorage").Reload:FireServer(math.huge)
+                end)
+            end
+        end)
+        showNotification("Infinite Ammo: ON")
+        print("Infinite Ammo enabled")
+    else
+        RunService:UnbindFromRenderStep("InfAmmo")
+        showNotification("Infinite Ammo: OFF")
+        print("Infinite Ammo disabled")
+    end
+    saveConfig()
+end
+
+-- Anti-Ban
+local function toggleAntiBan()
+    config.antiBan = not config.antiBan
+    if config.antiBan then
+        RunService:BindToRenderStep("AntiBan", Enum.RenderPriority.Character.Value, function()
+            pcall(function()
+                game:GetService("ReplicatedStorage").AntiCheat:FireServer(false)
+            end)
+        end)
+        showNotification("Anti-Ban: ON")
+        print("Anti-Ban enabled")
+    else
+        RunService:UnbindFromRenderStep("AntiBan")
+        showNotification("Anti-Ban: OFF")
+        print("Anti-Ban disabled")
+    end
+    saveConfig()
+end
+
+-- Unlock Zoom
+local function toggleUnlockZoom()
+    config.unlockZoom = not config.unlockZoom
+    if config.unlockZoom then
+        Camera.MaxZoomDistance = math.huge
+        showNotification("Unlock Zoom: ON")
+        print("Unlock Zoom enabled")
+    else
+        Camera.MaxZoomDistance = 128
+        showNotification("Unlock Zoom: OFF")
+        print("Unlock Zoom disabled")
+    end
+    saveConfig()
+end
+
+-- Day/Night Toggle
+local function toggleDayNight()
+    config.dayNightToggle = not config.dayNightToggle
+    if config.dayNightToggle then
+        Lighting.TimeOfDay = "12:00:00"
+        showNotification("Day/Night: Day")
+        print("Day enabled")
+    else
+        Lighting.TimeOfDay = "00:00:00"
+        showNotification("Day/Night: Night")
+        print("Night enabled")
+    end
+    saveConfig()
+end
+
+-- Spin Character
+local function toggleSpinCharacter()
+    config.spinCharacter = not config.spinCharacter
+    if config.spinCharacter then
+        RunService:BindToRenderStep("SpinCharacter", Enum.RenderPriority.Character.Value, function()
+            if LocalPlayer.Character and LocalPlayer.Character.HumanoidRootPart then
+                LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(10), 0)
+            end
+        end)
+        showNotification("Spin Character: ON")
+        print("Spin Character enabled")
+    else
+        RunService:UnbindFromRenderStep("SpinCharacter")
+        showNotification("Spin Character: OFF")
+        print("Spin Character disabled")
+    end
+    saveConfig()
+end
+
+-- Rainbow Character
+local function toggleRainbowCharacter()
+    config.rainbowCharacter = not config.rainbowCharacter
+    if config.rainbowCharacter then
+        RunService:BindToRenderStep("RainbowCharacter", Enum.RenderPriority.Character.Value, function()
+            if LocalPlayer.Character then
+                local hue = (tick() % 10) / 10 -- Цикл от 0 до 1 каждые 10 секунд
+                for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.BrickColor = BrickColor.new(Color3.fromHSV(hue, 1, 1))
+                    end
+                end
+            end
+        end)
+        showNotification("Rainbow Character: ON")
+        print("Rainbow Character enabled")
+    else
+        RunService:UnbindFromRenderStep("RainbowCharacter")
+        if LocalPlayer.Character then
+            for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.BrickColor = BrickColor.new("Institutional white") -- Сброс на стандартный цвет
+                end
+            end
+        end
+        showNotification("Rainbow Character: OFF")
+        print("Rainbow Character disabled")
+    end
+    saveConfig()
+end
+
+-- Создание кнопок для функций
+createButton("NoClip", 0, toggleNoClip)
+createButton("Fly", 50, toggleFly)
+createButton("Fly Settings", 100, openFlySettings)
+createButton("Invisibility", 150, toggleInvisibility)
+createButton("ESP (Players)", 200, toggleESP)
+createButton("Team ESP", 250, toggleTeamESP)
+createButton("Enemy ESP", 300, toggleEnemyESP)
+createButton("Item ESP", 350, toggleItemESP)
+createButton("SpeedHack", 400, toggleSpeedHack)
+createButton("SpeedHack Settings", 450, openSpeedHackSettings)
+createButton("Infinite Jump", 500, toggleInfJump)
+createButton("Super Jump", 550, toggleSuperJump)
+createButton("Kill Aura", 600, toggleKillAura)
+createButton("God Mode", 650, toggleGodMode)
+createButton("AutoFarm", 700, toggleAutoFarm)
+createButton("Auto Loot", 750, toggleAutoLoot)
+createButton("Auto Steal", 800, toggleAutoSteal)
+createButton("Auto Lock Base", 850, toggleAutoLockBase)
+createButton("Infinite Cash", 900, toggleInfiniteCash)
+createButton("Anti-Kick", 950, toggleAntiKick)
+createButton("Auto Respawn", 1000, toggleAutoRespawn)
+createButton("Instant Respawn", 1050, toggleInstantRespawn)
+createButton("Auto Heal", 1100, toggleAutoHeal)
+createButton("Teleport to Safe Zone", 1150, teleportToSafeZone)
+createButton("ESP Tracers", 1200, toggleESPTracers)
+createButton("Invisible Camera", 1250, toggleInvisibleCamera)
+createButton("Auto Interact", 1300, toggleAutoInteract)
+createButton("Speed Boost", 1350, toggleSpeedBoost)
