@@ -25,8 +25,8 @@ task.spawn(function()
 	end
 end)
 
--- Delay intro 8 detik
-task.wait(8)
+-- Delay intro 2 detik
+task.wait(2)
 intro:Destroy()
 
 -- Update character reference
@@ -177,7 +177,7 @@ function startAutoSummit()
 		for i = 2, #locations do
 			if not autoRunning then break end
 			hrp.CFrame = CFrame.new(locations[i][2])
-			for j = 1, 10 do
+			for j = 1, 2 do
 				if not autoRunning then break end
 				progress.Size = UDim2.new(j / 10, 0, 0, 6)
 				hrp.Velocity = Vector3.new(0, 50, 0)
