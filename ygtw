@@ -182,8 +182,7 @@ function startAutoSummit()
 				progress.Size = UDim2.new(j / 10, 0, 0, 6)
 				hrp.Velocity = Vector3.new(0, 50, 0)
 				task.wait(0.2)
-				hrp.CFrame = hrp.CFrame * CFrame.new(0, 0, j % 2 == 0 and -5 or 5)
-				task.wait(0.2)
+				
 			end
 		end
 		if autoRunning then
