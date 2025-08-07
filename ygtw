@@ -134,7 +134,7 @@ local locations = {
 	{"Camp 5", Vector3.new(-756.5, 1525.0, 2054.0)},
 	{"Camp 6", Vector3.new(-482.5, 1633.0, 2288.6)},
 	{"Camp 7", Vector3.new(-90.2, 1929.0, 2113.9)},
-	{"Puncak", Vector3.new(-6.5, 2493.0, 2074.8)},
+	{"Puncak", Vector3.new(2,2493,2043)},
 }
 
 -- Teleport Buttons
