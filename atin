@@ -50,6 +50,6 @@ task.spawn(function()
 
     -- Auto execute lagi (loop)
     queue_on_teleport([[
-        loadstring(game:HttpGet(""))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/emanwars/fling-all-aja/refs/heads/main/atin"))()
     ]])
 end)
